@@ -35,3 +35,12 @@ ENV/
 history/
 config.json
 *.log
+
+# System files
+.DS_Store
+Thumbs.db
+.env
+
+# Project directories to clean
+archive/
+**/archive/

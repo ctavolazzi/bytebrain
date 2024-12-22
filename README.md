@@ -1,104 +1,52 @@
-# Ollama Model Benchmarker
+# ByteBrain
 
-A comprehensive toolkit for evaluating and comparing Ollama models in real-world scenarios.
-
-## Purpose
-
-This tool helps you:
-- Compare different Ollama models' performance
-- Measure response times and token generation speeds
-- Test models under various loads (sequential vs parallel)
-- Monitor system resource usage during inference
-- Evaluate model responses across different types of prompts
+A system for automated bot-to-bot conversations using Ollama models.
 
 ## Features
 
-### Performance Testing
-- Response time measurements
-- Token generation speed
-- Streaming vs non-streaming comparison
-- Parallel processing capabilities
-- Connection and resource monitoring
-
-### Model Comparison
-- Side-by-side model outputs
-- Response quality metrics
-- Memory and CPU usage
-- Chunk size analysis
-- Token efficiency
-
-### Testing Scenarios
-- Basic prompts
-- Complex reasoning
-- Code generation
-- Creative writing
-- Mathematical problems
+- Simple Ollama client for model interactions
+- Bot abstraction for easy response handling
+- Support for both streaming and non-streaming responses
+- Automated multi-round conversations between two bots
+- Session management for conversation history
 
 ## Installation
 
+1. Make sure you have [Ollama](https://ollama.ai) installed and running
+2. Clone this repository
+3. Install dependencies:
 ```bash
+pip install poetry
 poetry install
 ```
 
 ## Usage
 
-### Basic Model Testing
 ```python
-from ollama_model_benchmarker import *
+from auto_chat.auto_command import AutoCommandHandler
+from auto_chat.session_manager import SessionManager
 
-# Single model test
-bot = OllamaBot()
-response = bot.generate_response(
-    prompt="Explain quantum computing",
-    stream=True  # Enable streaming for token-by-token analysis
+# Create a new session and handler
+handler = AutoCommandHandler(SessionManager.create_new_session())
+
+# Start a conversation with 3 rounds
+handler.start(
+    initial_prompt="Let's have a conversation about cats. What do you like about them?",
+    max_iterations=3,
+    stream=True  # Set to False for non-streaming responses
 )
 ```
 
-### Comparative Testing
-```python
-# Sequential comparison
-run_sequential_queries([
-    "llama3.2",
-    "codellama",
-    "nemotron-mini"
-], prompt="Write a Python function that...")
+## Project Structure
 
-# Parallel comparison
-await run_parallel_queries([
-    "llama3.2",
-    "codellama",
-    "nemotron-mini"
-], prompt="Solve this math problem...")
-```
+- `ollama_client.py` - Simple wrapper for Ollama API
+- `bots/ollama_bot.py` - Bot implementation with streaming/non-streaming support
+- `auto_chat/` - Core conversation automation
+  - `auto_command.py` - Main handler for bot-to-bot conversations
+  - `session_manager.py` - Manages conversation history
 
-### Performance Metrics
-```python
-# Get detailed metrics
-metrics = bot.get_performance_metrics()
-print(f"Response Time: {metrics['response_time']}s")
-print(f"Tokens/second: {metrics['tokens_per_second']}")
-print(f"Memory Usage: {metrics['memory_usage']}MB")
-```
+## Requirements
 
-## Development
-
-```bash
-# Run all tests
-poetry run pytest
-
-# Run specific test categories
-poetry run pytest test_program.py -k "test_streaming"
-poetry run pytest test_program.py -k "test_parallel"
-```
-
-## Contributing
-
-Contributions welcome! Areas of interest:
-- Additional model support
-- New testing scenarios
-- Performance optimizations
-- Metric collection enhancements
-
-## License
-
-MIT
+- Python 3.8+
+- Ollama
+- Poetry for dependency management
