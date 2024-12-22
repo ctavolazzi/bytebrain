@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "ollama_model_benchmarker"
+version = "0.1.0"
+description = "A benchmarking tool for Ollama models with parallel and sequential testing capabilities"
+authors = ["Christopher Tavolazzi <ctavolazzi@gmail.com>"]
+readme = "README.md"
+packages = [
+    {include = "bots"},
+    {include = "auto_chat"},
+    {include = "ollama_client.py"}
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+ollama = "^0.1.0"
+psutil = "^5.9.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

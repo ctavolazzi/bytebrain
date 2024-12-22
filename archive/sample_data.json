@@ -1,0 +1,83 @@
+[
+    {
+      "id": "9242f039-9fbf-406e-94eb-8fccb5cdfb50",
+      "title": "Adaptive next generation Graphical User Interface",
+      "author": "Cody Cortez",
+      "published_year": 1981,
+      "category": "Non-fiction",
+      "price": 3.04,
+      "in_stock": false
+    },
+    {
+      "id": "a328647d-0ce7-40ea-846f-d09277726825",
+      "title": "Synergized clear-thinking forecast",
+      "author": "Joshua Graham",
+      "published_year": 1931,
+      "category": "History",
+      "price": 12.43,
+      "in_stock": true
+    },
+    {
+      "id": "60e50bb7-b453-4bca-961e-784fc56f402e",
+      "title": "Ergonomic well-modulated utilization",
+      "author": "Cassandra Clark",
+      "published_year": 1986,
+      "category": "Non-fiction",
+      "price": 49.37,
+      "in_stock": false
+    },
+    {
+      "id": "131c0185-2183-466e-b07e-00d7d8c3e411",
+      "title": "Networked coherent moderator",
+      "author": "Collin Smith",
+      "published_year": 1904,
+      "category": "Fiction",
+      "price": 8.67,
+      "in_stock": true
+    },
+    {
+      "id": "034955dc-c3d7-47ce-9890-345440e9bfd6",
+      "title": "Managed maximized intranet",
+      "author": "Shane Kline",
+      "published_year": 1929,
+      "category": "Fiction",
+      "price": 46.97,
+      "in_stock": true
+    },
+    {
+      "id": "128910e6-f9a2-41b7-8d2b-55a3fd0902a7",
+      "title": "Phased executive monitoring",
+      "author": "Erica Cannon",
+      "published_year": 1991,
+      "category": "Mystery",
+      "price": 19.05,
+      "in_stock": false
+    },
+    {
+      "id": "dab937c1-e9d9-4688-9bb5-d19ee6d4f1fc",
+      "title": "Reverse-engineered dynamic alliance",
+      "author": "Sean Logan",
+      "published_year": 1975,
+      "category": "Fantasy",
+      "price": 1.53,
+      "in_stock": true
+    },
+    {
+      "id": "ce56432f-522e-43fe-bc5e-1aa7079bde7d",
+      "title": "Face-to-face full-range hardware",
+      "author": "Richard Sanchez",
+      "published_year": 1989,
+      "category": "Mystery",
+      "price": 28.87,
+      "in_stock": false
+    },
+    {
+      "id": "7d7c2172-b4e9-4346-9ae8-15cd1f78ac24",
+      "title": "Diverse content-based approach",
+      "author": "Natasha Norton",
+      "published_year": 1919,
+      "category": "History",
+      "price": 28.57,
+      "in_stock": true
+    }
+]
