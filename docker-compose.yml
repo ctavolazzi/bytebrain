@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  novasystem:
+    build:
+      context: .
+      target: production
+    volumes:
+      - ./history:/app/history
+      - ./logs:/app/logs
+      - ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=http://localhost:11434
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "11434:11434"
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 1G
+
+volumes:
+  ollama_models:

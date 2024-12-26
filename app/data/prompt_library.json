@@ -1,0 +1,29 @@
+{
+  "prompts": [
+    {
+      "name": "Basic Conversation",
+      "prompt": "Hello! How are you today?",
+      "category": "General"
+    },
+    {
+      "name": "Code Review",
+      "prompt": "Please review this Python function:\n\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    return fibonacci(n-1) + fibonacci(n-2)",
+      "category": "Programming"
+    },
+    {
+      "name": "Creative Writing",
+      "prompt": "Write a short story about a robot discovering emotions for the first time.",
+      "category": "Creative"
+    },
+    {
+      "name": "Problem Solving",
+      "prompt": "How would you design a system to handle 1 million concurrent users?",
+      "category": "Technical"
+    },
+    {
+      "name": "Data Analysis",
+      "prompt": "Analyze this dataset and provide insights: [temperature: 25°C, humidity: 60%, wind_speed: 10km/h]",
+      "category": "Analysis"
+    }
+  ]
+}

@@ -5,19 +5,37 @@ description = "A benchmarking tool for Ollama models with parallel and sequentia
 authors = ["Christopher Tavolazzi <ctavolazzi@gmail.com>"]
 readme = "README.md"
 packages = [
+    {include = "app"},
     {include = "bots"},
     {include = "auto_chat"},
     {include = "ollama_client.py"}
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<4.0"
-ollama = "^0.1.0"
+python = ">=3.10,<3.14"
+ollama = "^0.1.9"
 psutil = "^5.9.0"
+pyautogen = "^0.6.0"
+fix-busted-json = "^0.0.18"
+streamlit = "^1.41.1"
+gputil = "^1.4.0"
+flask = "^3.1.0"
+fastapi = "^0.109.0"
+uvicorn = "^0.25.0"
+motor = "^3.3.2"
+jinja2 = "^3.1.2"
+aiohttp = "^3.9.1"
+httpx = "^0.27.0"
+fastapi-cache2 = "^0.2.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
 pytest-asyncio = "^0.21.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+httpx = "^0.27.0"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,91 +1,119 @@
 import json
-import logging
+import os
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Dict, List, Optional, Union
 
+from .session_manager import SessionManager
 from bots.ollama_bot import OllamaBot
-from auto_chat.session_manager import SessionManager
-
-logger = logging.getLogger(__name__)
+from nova_system.core import NovaSystemCore
+from nova_system.agents import AgentOrchestrator
 
 class AutoCommandHandler:
-    """Handles automated multi-round conversations between bots."""
+    """Handles automated chat commands and interactions."""
 
-    def __init__(self, session_manager: SessionManager):
-        """Initialize the handler with a session manager."""
-        self.session_manager = session_manager
-        self.config = self._load_config()
-        self.bot1 = OllamaBot()  # First bot
-        self.bot2 = OllamaBot()  # Second bot
-
-    def _load_config(self) -> Dict[str, Any]:
-        """Load configuration from file."""
-        try:
-            with open('config.json', 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            logger.error(f"Failed to load config: {e}")
-            return {}
-
-    def _save_interaction(self, prompt: str, response: str, bot_number: int) -> None:
-        """Save an interaction to the session."""
-        try:
-            model_responses = {
-                f"bot{bot_number}": {
-                    "response": response,
-                    "time_to_first_token": 0,
-                    "total_time": 0,
-                    "chunk_count": 0,
-                    "word_count": len(response.split())
-                }
-            }
-            self.session_manager.save_interaction(prompt, model_responses)
-            logger.info(f"Saved interaction from bot{bot_number} to session {self.session_manager.session_id}")
-        except Exception as e:
-            logger.error(f"Failed to save interaction: {e}")
-
-    def start(self, initial_prompt: str, max_iterations: int = 5, stream: bool = True) -> None:
-        """Start an automated conversation between two bots.
+    def __init__(self, config_path: str = "config.json"):
+        """Initialize the command handler.
 
         Args:
-            initial_prompt: The prompt to start the conversation
-            max_iterations: Maximum number of back-and-forth exchanges
-            stream: Whether to stream the responses
+            config_path: Path to configuration file
         """
-        current_prompt = initial_prompt
-        print(f"\nStarting conversation with prompt: {initial_prompt}")
+        self.config = self._load_config(config_path)
+        self.session_manager = SessionManager()
+        self.bot = OllamaBot(model=self.config.get("model", "llama3.2"))
+        self.nova_core = NovaSystemCore()
+        self.agent_orchestrator = AgentOrchestrator()
 
-        for i in range(max_iterations):
-            print(f"\nRound {i+1}:")
+    def _load_config(self, config_path: str) -> Dict:
+        """Load configuration from file.
 
-            # Bot 1's turn
-            print("\nBot 1: ", end="", flush=True)
+        Args:
+            config_path: Path to configuration file
+
+        Returns:
+            Dictionary containing configuration
+        """
+        try:
+            with open(config_path, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error loading config: {e}")
+            return {}
+
+    async def process_message(self, message: str, stream: bool = False) -> Union[str, AsyncGenerator[str, None]]:
+        """Process a user message and get response.
+
+        Args:
+            message: The user's message
+            stream: Whether to stream the response
+
+        Returns:
+            The bot's response or a response stream
+        """
+        # Log the interaction start
+        interaction = {
+            "timestamp": datetime.now().isoformat(),
+            "user_message": message,
+            "type": "stream" if stream else "complete"
+        }
+
+        try:
+            # Process through Nova System
+            nova_context = await self.nova_core.process_message(message)
+
+            # Get response through agent orchestration
+            agent_result = await self.agent_orchestrator.process_turn(message)
+
+            # Get bot response
             if stream:
-                response1 = ""
-                for chunk in self.bot1.get_streaming_response(current_prompt):
-                    print(chunk, end="", flush=True)
-                    response1 += chunk
-                print()
+                async def response_stream():
+                    async for chunk in self.bot.get_streaming_response(message):
+                        yield chunk
+                response = response_stream()
             else:
-                response1 = self.bot1.get_response(current_prompt)
-                print(response1)
+                response = await self.bot.get_response(message)
 
-            self._save_interaction(current_prompt, response1, 1)
-            current_prompt = response1  # Bot 2 will respond to Bot 1's response
+            # Update interaction with response
+            interaction.update({
+                "status": "success",
+                "nova_context": nova_context,
+                "agent_result": agent_result,
+                "response": response if not stream else "streaming"
+            })
 
-            # Bot 2's turn
-            print("\nBot 2: ", end="", flush=True)
-            if stream:
-                response2 = ""
-                for chunk in self.bot2.get_streaming_response(current_prompt):
-                    print(chunk, end="", flush=True)
-                    response2 += chunk
-                print()
-            else:
-                response2 = self.bot2.get_response(current_prompt)
-                print(response2)
+        except Exception as e:
+            error_msg = f"Error processing message: {str(e)}"
+            interaction.update({
+                "status": "error",
+                "error": error_msg
+            })
+            response = error_msg
 
-            self._save_interaction(current_prompt, response2, 2)
-            current_prompt = response2  # Next round, Bot 1 will respond to Bot 2's response
+        # Save interaction
+        self.session_manager.add_interaction(interaction)
 
-        print("\nConversation ended after", max_iterations, "rounds")
+        return response
+
+    def save_interaction(self, interaction: Dict):
+        """Save an interaction to the current session.
+
+        Args:
+            interaction: The interaction to save
+        """
+        self.session_manager.add_interaction(interaction)
+
+    def get_session_info(self) -> Dict:
+        """Get information about the current session.
+
+        Returns:
+            Dictionary containing session information
+        """
+        return {
+            "session": self.session_manager.get_session_summary(),
+            "nova_system": self.nova_core.get_conversation_summary(),
+            "agent_states": self.agent_orchestrator.get_agent_states(),
+            "model_version": self.bot.get_model_version()
+        }
+
+    def close(self):
+        """Clean up resources and close the session."""
+        self.session_manager.close_session()

@@ -1,0 +1,113 @@
+{
+  "timestamp": "2024-12-25T22:21:26.671844",
+  "system_info": {
+    "platform": "macOS-12.7.4-x86_64-i386-64bit",
+    "processor": "i386",
+    "python_version": "3.10.0",
+    "cpu": {
+      "physical_cores": 4,
+      "total_cores": 8,
+      "max_frequency": 2200,
+      "min_frequency": 2200,
+      "current_frequency": 2200
+    },
+    "memory": {
+      "total": 16.0,
+      "available": 5.889545440673828,
+      "used": 7.909305572509766,
+      "percent_used": 63.2
+    },
+    "gpu": null
+  },
+  "prompt": "What is 2+2?",
+  "results": [
+    {
+      "model": "wizardlm2",
+      "timing": {
+        "time_to_first_token": 2.7591529549999905,
+        "total_time": 29.727157863000002
+      },
+      "throughput": {
+        "total_chunks": 33,
+        "total_bytes": 142,
+        "average_chunk_size": 4.303030303030303,
+        "bytes_per_second": 4.776776866944981
+      },
+      "system_impact": {
+        "cpu_delta": [
+          -11.799999999999997,
+          -27.3,
+          -40.0,
+          -20.0,
+          -36.4,
+          -9.1,
+          -9.099999999999994,
+          -20.0
+        ],
+        "memory_delta": 0.15532302856445312
+      },
+      "success": true,
+      "timestamp": "2024-12-25 22:20:56.944476",
+      "response": "2 + 2 equals 4. It's one of the most fundamental arithmetic operations and its result is consistently the same in all standard number systems."
+    },
+    {
+      "model": "nemotron-mini",
+      "timing": {
+        "time_to_first_token": 1.8105695100000503,
+        "total_time": 23.237474196999983
+      },
+      "throughput": {
+        "total_chunks": 46,
+        "total_bytes": 246,
+        "average_chunk_size": 5.3478260869565215,
+        "bytes_per_second": 10.586348495300717
+      },
+      "system_impact": {
+        "cpu_delta": [
+          -9.099999999999994,
+          36.5,
+          -20.0,
+          31.0,
+          -20.0,
+          59.599999999999994,
+          -10.0,
+          50.6
+        ],
+        "memory_delta": 0.18622207641601562
+      },
+      "success": true,
+      "timestamp": "2024-12-25 22:20:57.051281",
+      "response": " The answer to your question depends on the context in which you're asking it. Could you please provide more information about the specific situation or scenario where this math problem arises, so I can give a more accurate and relevant response?"
+    },
+    {
+      "model": "llama3.2",
+      "timing": {
+        "time_to_first_token": 2.1213694089999535,
+        "total_time": 12.098261622999985
+      },
+      "throughput": {
+        "total_chunks": 8,
+        "total_bytes": 10,
+        "average_chunk_size": 1.25,
+        "bytes_per_second": 0.8265650315404832
+      },
+      "system_impact": {
+        "cpu_delta": [
+          9.099999999999994,
+          80.0,
+          0.0,
+          66.7,
+          0.0,
+          80.0,
+          9.099999999999994,
+          60.0
+        ],
+        "memory_delta": 0.17264938354492188
+      },
+      "success": true,
+      "timestamp": "2024-12-25 22:20:57.224501",
+      "response": "2 + 2 = 4."
+    }
+  ],
+  "_id": "20241225_222126"
+}

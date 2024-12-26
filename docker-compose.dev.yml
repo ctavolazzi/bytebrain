@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  novasystem:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # Use development stage
+      target: development
+    volumes:
+      # Mount the entire project for development
+      - .:/app
+      # Mount Ollama models
+      - ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_HOST=http://localhost:11434
+      - PYTHONPATH=/app
+      # Development specific environment variables
+      - PYTHON_ENV=development
+      - DEBUG=1
+    ports:
+      - "11434:11434"  # Ollama API port
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+        reservations:
+          memory: 4G
+    # Override entrypoint for development
+    entrypoint: []
+    # Default command runs tests
+    command: poetry run pytest
+
+  # Development tools container
+  devtools:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONPATH=/app
+      - PYTHON_ENV=development
+    # Development tools and commands
+    entrypoint: []
+    command: /bin/bash
+    profiles:
+      - tools
+
+volumes:
+  ollama_models:

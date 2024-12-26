@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ollama Model Benchmark</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-section {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .model-result {
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .metric-group {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .history {
+            margin-top: 30px;
+        }
+        .history-item {
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .history-item:hover {
+            background: #f8f9fa;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ollama Model Benchmark</h1>
+
+        <div class="input-section">
+            <h2>Run New Benchmark</h2>
+            <textarea id="prompt" placeholder="Enter your prompt here..." onkeydown="handleKeyPress(event)"></textarea>
+            <button onclick="runBenchmark()">Run Benchmark</button>
+            <div id="loading" class="loading">Running benchmark...</div>
+            <div id="error" class="error"></div>
+        </div>
+
+        <div id="current-results" class="results"></div>
+
+        <div class="history">
+            <h2>Benchmark History</h2>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Handle Enter key press
+        function handleKeyPress(event) {
+            // Check if Enter was pressed without Shift (Shift+Enter allows multiline)
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault(); // Prevent newline
+                runBenchmark();
+            }
+        }
+
+        // Run benchmark
+        async function runBenchmark() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) {
+                showError('Prompt cannot be empty');
+                return;
+            }
+
+            showLoading(true);
+            showError('');
+
+            try {
+                const response = await fetch('/run_benchmark', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    displayResults(data);
+                    loadHistory();
+                } else {
+                    showError(data.error || 'Failed to run benchmark');
+                }
+            } catch (error) {
+                showError('Error running benchmark: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Display benchmark results
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('current-results');
+            resultsDiv.innerHTML = '<h2>Current Results</h2>';
+
+            // System Info
+            const sysInfo = data.system_info;
+            resultsDiv.innerHTML += `
+                <div class="model-result">
+                    <h3>System Information</h3>
+                    <div class="metrics">
+                        <div class="metric-group">
+                            <p>Platform: ${sysInfo.platform}</p>
+                            <p>CPU Cores: ${sysInfo.cpu.physical_cores} physical, ${sysInfo.cpu.total_cores} total</p>
+                            <p>Memory: ${sysInfo.memory.total.toFixed(1)}GB total</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Model Results
+            data.results.forEach(result => {
+                if (result.success) {
+                    resultsDiv.innerHTML += `
+                        <div class="model-result">
+                            <h3>${result.model}</h3>
+                            <p><strong>Response:</strong><br>${result.response || ''}</p>
+                            <div class="metrics">
+                                <div class="metric-group">
+                                    <h4>Timing</h4>
+                                    <p>First chunk: ${result.timing.time_to_first_chunk.toFixed(2)}s</p>
+                                    <p>Total time: ${result.timing.total_time.toFixed(2)}s</p>
+                                    <p>Avg chunk time: ${result.timing.average_chunk_time.toFixed(3)}s</p>
+                                </div>
+                                <div class="metric-group">
+                                    <h4>Throughput</h4>
+                                    <p>Total chunks: ${result.throughput.total_chunks}</p>
+                                    <p>Total bytes: ${result.throughput.total_bytes}</p>
+                                    <p>Bytes/second: ${result.throughput.bytes_per_second.toFixed(2)}</p>
+                                </div>
+                                <div class="metric-group">
+                                    <h4>System Impact</h4>
+                                    <p>CPU delta: ${Math.max(...result.system_impact.cpu_delta).toFixed(1)}%</p>
+                                    <p>Memory delta: ${result.system_impact.memory_delta.toFixed(1)}%</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML += `
+                        <div class="model-result">
+                            <h3>${result.model}</h3>
+                            <p class="error">Error: ${result.error}</p>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Load and display benchmark history
+        async function loadHistory() {
+            try {
+                const response = await fetch('/history');
+                const history = await response.json();
+
+                const historyDiv = document.getElementById('history-list');
+                historyDiv.innerHTML = '';
+
+                history.forEach(item => {
+                    const timestamp = new Date(item.timestamp).toLocaleString();
+                    const firstResult = item.results[0];
+                    const prompt = firstResult?.prompt || 'Unknown prompt';
+
+                    historyDiv.innerHTML += `
+                        <div class="history-item" onclick='displayResults(${JSON.stringify(item)})'>
+                            <strong>${timestamp}</strong><br>
+                            Prompt: ${prompt}<br>
+                            Models: ${item.results.map(r => r.model).join(', ')}
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        function showError(message) {
+            document.getElementById('error').textContent = message;
+        }
+
+        // Load history on page load
+        loadHistory();
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+{
+  "timestamp": "2024-12-25T22:23:10.606737",
+  "system_info": {
+    "platform": "macOS-12.7.4-x86_64-i386-64bit",
+    "processor": "i386",
+    "python_version": "3.10.0",
+    "cpu": {
+      "physical_cores": 4,
+      "total_cores": 8,
+      "max_frequency": 2200,
+      "min_frequency": 2200,
+      "current_frequency": 2200
+    },
+    "memory": {
+      "total": 16.0,
+      "available": 4.899517059326172,
+      "used": 6.977302551269531,
+      "percent_used": 69.4
+    },
+    "gpu": null
+  },
+  "prompt": "What is 2+2?",
+  "results": [
+    {
+      "model": "wizardlm2",
+      "timing": {
+        "time_to_first_token": 4.882195077000006,
+        "total_time": 49.63423826199994
+      },
+      "throughput": {
+        "total_chunks": 73,
+        "total_bytes": 295,
+        "average_chunk_size": 4.041095890410959,
+        "bytes_per_second": 5.943477936395621
+      },
+      "system_impact": {
+        "cpu_delta": [
+          35.7,
+          58.6,
+          41.199999999999996,
+          60.0,
+          43.5,
+          65.4,
+          44.60000000000001,
+          70.2
+        ],
+        "memory_delta": 1.0728073120117188
+      },
+      "success": true,
+      "timestamp": "2024-12-25 22:22:20.996148",
+      "response": "2 + 2 equals 4. This is a basic arithmetic fact that is universally true in standard mathematics. If you're dealing with non-standard mathematical systems where the symbols \"+\" and \"2\" might have different definitions, the result could vary, but in conventional arithmetic, 2 plus 2 is indeed 4."
+    },
+    {
+      "model": "nemotron-mini",
+      "timing": {
+        "time_to_first_token": 1.5533101370000395,
+        "total_time": 32.433831930999986
+      },
+      "throughput": {
+        "total_chunks": 60,
+        "total_bytes": 285,
+        "average_chunk_size": 4.75,
+        "bytes_per_second": 8.787120825140596
+      },
+      "system_impact": {
+        "cpu_delta": [
+          -0.09999999999999432,
+          87.4,
+          -0.09999999999999432,
+          87.6,
+          99.9,
+          87.6,
+          99.9,
+          87.3
+        ],
+        "memory_delta": 1.0856437683105469
+      },
+      "success": true,
+      "timestamp": "2024-12-25 22:22:20.999569",
+      "response": " The answer to your question depends on the context in which it's asked. Could you please provide more information about what specifically you would like me to calculate or understand, such as a mathematical expression with operators (+, -, x, /) and operands (integers, floats, etc.)?"
+    },
+    {
+      "model": "llama3.2",
+      "timing": {
+        "time_to_first_token": 5.831132500000081,
+        "total_time": 18.569687972999986
+      },
+      "throughput": {
+        "total_chunks": 8,
+        "total_bytes": 10,
+        "average_chunk_size": 1.25,
+        "bytes_per_second": 0.5385120102470129
+      },
+      "system_impact": {
+        "cpu_delta": [
+          99.9,
+          88.6,
+          99.9,
+          89.1,
+          99.9,
+          88.1,
+          99.9,
+          88.3
+        ],
+        "memory_delta": 1.032867431640625
+      },
+      "success": true,
+      "timestamp": "2024-12-25 22:22:20.999888",
+      "response": "2 + 2 = 4."
+    }
+  ],
+  "_id": "20241225_222310"
+}

@@ -1,0 +1,243 @@
+{
+  "timestamp": "2024-12-25T12:38:28.564034",
+  "system_info": {
+    "platform": "macOS-12.7.4-x86_64-i386-64bit",
+    "processor": "i386",
+    "python_version": "3.10.0",
+    "cpu": {
+      "physical_cores": 4,
+      "total_cores": 8,
+      "max_frequency": 2200,
+      "min_frequency": 2200,
+      "current_frequency": 2200
+    },
+    "memory": {
+      "total": 16.0,
+      "available": 4.984100341796875,
+      "used": 6.8487701416015625,
+      "percent_used": 68.8
+    },
+    "gpu": []
+  },
+  "results": [
+    {
+      "model": "wizardlm2",
+      "timing": {
+        "time_to_first_chunk": 1.764023780822754,
+        "total_time": 17.798078775405884,
+        "average_chunk_time": 0.2579373864160068,
+        "max_chunk_time": 1.764023780822754,
+        "min_chunk_time": 0.20743799209594727
+      },
+      "throughput": {
+        "total_chunks": 69,
+        "total_bytes": 294,
+        "average_chunk_size": 4.260869565217392,
+        "bytes_per_second": 16.518636854572264
+      },
+      "system_impact": {
+        "cpu_delta": [
+          -3.1999999999999993,
+          1.0,
+          -8.0,
+          0.0,
+          -6.1,
+          1.0,
+          -13.0,
+          -1.0
+        ],
+        "memory_delta": -1.3000000000000114,
+        "start_metrics": {
+          "cpu_percent": [
+            26.0,
+            0.0,
+            23.8,
+            1.0,
+            17.0,
+            1.0,
+            22.0,
+            1.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 68.9,
+          "swap_percent": 83.7,
+          "disk_usage": 97.7,
+          "network": {
+            "bytes_sent": 223193088,
+            "bytes_recv": 1407221760
+          }
+        },
+        "end_metrics": {
+          "cpu_percent": [
+            22.8,
+            1.0,
+            15.8,
+            1.0,
+            10.9,
+            2.0,
+            9.0,
+            0.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 67.6,
+          "swap_percent": 82.8,
+          "disk_usage": 97.7,
+          "network": {
+            "bytes_sent": 223276032,
+            "bytes_recv": 1407294464
+          }
+        }
+      },
+      "success": true,
+      "timestamp": "2024-12-25T12:38:03.479985",
+      "prompt": "Tell me your name please.",
+      "response": " I am an AI digital assistant designed to help with a wide range of questions and tasks. While I don't have personal attributes like a human does, you can refer to me as your helpful AI assistant or simply as \"ChatGPT\" if we're following the model created by OpenAI. How can I assist you today?"
+    },
+    {
+      "model": "nemotron-mini",
+      "timing": {
+        "time_to_first_chunk": 2.8040690422058105,
+        "total_time": 9.620743751525879,
+        "average_chunk_time": 0.20042523245016733,
+        "max_chunk_time": 2.8040690422058105,
+        "min_chunk_time": 0.13004112243652344
+      },
+      "throughput": {
+        "total_chunks": 48,
+        "total_bytes": 194,
+        "average_chunk_size": 4.041666666666667,
+        "bytes_per_second": 20.16476116716351
+      },
+      "system_impact": {
+        "cpu_delta": [
+          0.3999999999999986,
+          2.0,
+          -7.0,
+          0.0,
+          -5.700000000000003,
+          2.0,
+          -2.8999999999999986,
+          -1.0
+        ],
+        "memory_delta": -6.5,
+        "start_metrics": {
+          "cpu_percent": [
+            36.6,
+            1.0,
+            34.0,
+            1.0,
+            32.7,
+            0.0,
+            27.7,
+            2.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 67.5,
+          "swap_percent": 82.8,
+          "disk_usage": 97.7,
+          "network": {
+            "bytes_sent": 223277056,
+            "bytes_recv": 1407296512
+          }
+        },
+        "end_metrics": {
+          "cpu_percent": [
+            37.0,
+            3.0,
+            27.0,
+            1.0,
+            27.0,
+            2.0,
+            24.8,
+            1.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 61.0,
+          "swap_percent": 81.2,
+          "disk_usage": 97.7,
+          "network": {
+            "bytes_sent": 224003072,
+            "bytes_recv": 1407368192
+          }
+        }
+      },
+      "success": true,
+      "timestamp": "2024-12-25T12:38:15.110798",
+      "prompt": "Tell me your name please.",
+      "response": " Sure, I'd be happy to help you with that! My name is Nemotron, and I'm an artificial intelligence language model trained to assist users in a variety of ways. What would you like to know or do?"
+    },
+    {
+      "model": "llama3.2",
+      "timing": {
+        "time_to_first_chunk": 1.6198837757110596,
+        "total_time": 11.447625160217285,
+        "average_chunk_time": 0.14132544140756867,
+        "max_chunk_time": 1.6198837757110596,
+        "min_chunk_time": 0.10476207733154297
+      },
+      "throughput": {
+        "total_chunks": 81,
+        "total_bytes": 355,
+        "average_chunk_size": 4.382716049382716,
+        "bytes_per_second": 31.01079874921951
+      },
+      "system_impact": {
+        "cpu_delta": [
+          -29.1,
+          1.0,
+          -26.700000000000003,
+          0.0,
+          -42.5,
+          0.0,
+          -34.4,
+          0.0
+        ],
+        "memory_delta": -2.299999999999997,
+        "start_metrics": {
+          "cpu_percent": [
+            43.0,
+            0.0,
+            35.6,
+            1.0,
+            48.5,
+            0.0,
+            40.4,
+            0.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 61.0,
+          "swap_percent": 81.2,
+          "disk_usage": 97.7,
+          "network": {
+            "bytes_sent": 224005120,
+            "bytes_recv": 1407371264
+          }
+        },
+        "end_metrics": {
+          "cpu_percent": [
+            13.9,
+            1.0,
+            8.9,
+            1.0,
+            6.0,
+            0.0,
+            6.0,
+            0.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 58.7,
+          "swap_percent": 78.7,
+          "disk_usage": 97.7,
+          "network": {
+            "bytes_sent": 224061440,
+            "bytes_recv": 1407426560
+          }
+        }
+      },
+      "success": true,
+      "timestamp": "2024-12-25T12:38:28.563821",
+      "prompt": "Tell me your name please.",
+      "response": "I don't have a personal name, but I'm an AI designed to assist and communicate with users in a helpful and informative way. I'm often referred to as a \"language model\" or a \"chatbot.\" You can think of me as a conversational partner who's here to provide information, answer questions, and engage in discussions on a wide range of topics. What's your name?"
+    }
+  ]
+}

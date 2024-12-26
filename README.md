@@ -1,52 +1,107 @@
-# ByteBrain
+# Ollama Model Benchmarker
 
-A system for automated bot-to-bot conversations using Ollama models.
+A FastAPI-based application for benchmarking local Large Language Models (LLMs) via Ollama. This tool helps you compare different models' performance, resource usage, and response quality.
 
 ## Features
 
-- Simple Ollama client for model interactions
-- Bot abstraction for easy response handling
-- Support for both streaming and non-streaming responses
-- Automated multi-round conversations between two bots
-- Session management for conversation history
+- Benchmark multiple Ollama models in parallel
+- Collect detailed system metrics (CPU, memory, GPU usage)
+- Track timing metrics (time to first token, total time)
+- Store results in MongoDB (with JSON file fallback)
+- Simple web interface for running benchmarks and viewing results
+
+## Prerequisites
+
+- Python 3.10 or higher
+- Ollama installed and running locally
+- MongoDB (optional)
 
 ## Installation
 
-1. Make sure you have [Ollama](https://ollama.ai) installed and running
-2. Clone this repository
-3. Install dependencies:
+1. Clone the repository:
 ```bash
-pip install poetry
+git clone <repository-url>
+cd ollama-benchmarker
+```
+
+2. Install dependencies using Poetry:
+```bash
 poetry install
+```
+
+Or using pip:
+```bash
+pip install -r requirements.txt
+```
+
+## Configuration
+
+The application uses environment variables for configuration:
+
+- `MONGODB_URL`: MongoDB connection URL (default: "mongodb://localhost:27017")
+- `PORT`: Port to run the FastAPI server (default: 8000)
+
+Create a `.env` file in the project root:
+```
+MONGODB_URL=mongodb://localhost:27017
+PORT=8000
 ```
 
 ## Usage
 
-```python
-from auto_chat.auto_command import AutoCommandHandler
-from auto_chat.session_manager import SessionManager
-
-# Create a new session and handler
-handler = AutoCommandHandler(SessionManager.create_new_session())
-
-# Start a conversation with 3 rounds
-handler.start(
-    initial_prompt="Let's have a conversation about cats. What do you like about them?",
-    max_iterations=3,
-    stream=True  # Set to False for non-streaming responses
-)
+1. Start the FastAPI server:
+```bash
+poetry run uvicorn app.main:app --reload
 ```
 
-## Project Structure
+2. Open your browser and navigate to:
+```
+http://localhost:8000/api/benchmarks/
+```
 
-- `ollama_client.py` - Simple wrapper for Ollama API
-- `bots/ollama_bot.py` - Bot implementation with streaming/non-streaming support
-- `auto_chat/` - Core conversation automation
-  - `auto_command.py` - Main handler for bot-to-bot conversations
-  - `session_manager.py` - Manages conversation history
+3. Enter a prompt and select the models you want to benchmark.
 
-## Requirements
+4. View the results in real-time, including:
+   - System information
+   - Response timing
+   - Resource usage
+   - Model outputs
 
-- Python 3.8+
-- Ollama
-- Poetry for dependency management
+## API Endpoints
+
+- `POST /api/benchmarks/run`: Run benchmarks
+  ```json
+  {
+    "prompt": "Your prompt here",
+    "models": ["wizardlm2", "nemotron-mini"],
+    "parameters": {}
+  }
+  ```
+
+- `GET /api/benchmarks/history`: Get benchmark history
+- `GET /api/benchmarks/history/{id}`: Get specific benchmark result
+- `GET /api/benchmarks/`: Web UI
+
+## Development
+
+1. Install development dependencies:
+```bash
+poetry install --with dev
+```
+
+2. Run tests:
+```bash
+poetry run pytest
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+MIT License

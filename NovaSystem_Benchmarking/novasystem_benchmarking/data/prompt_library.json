@@ -36,6 +36,21 @@
       "name": "Custom Prompt 1",
       "prompt": "Count from 1 to 10",
       "category": "Custom"
+    },
+    {
+      "name": "Custom Prompt 2",
+      "prompt": "Tell me a two sentence horror story please.",
+      "category": "Custom"
+    },
+    {
+      "name": "Custom Prompt 3",
+      "prompt": "Write a two sentence horror story.",
+      "category": "Custom"
+    },
+    {
+      "name": "Custom Prompt 4",
+      "prompt": "Repeat this sentence: The QUICK brown Fox Jumps Over The Lazy Dog",
+      "category": "Custom"
     }
   ]
 }

@@ -1,0 +1,237 @@
+{
+  "timestamp": "2024-12-25T12:33:51.335888",
+  "system_info": {
+    "platform": "macOS-12.7.4-x86_64-i386-64bit",
+    "processor": "i386",
+    "python_version": "3.10.0",
+    "cpu": {
+      "physical_cores": 4,
+      "total_cores": 8,
+      "max_frequency": 2200,
+      "min_frequency": 2200,
+      "current_frequency": 2200
+    },
+    "memory": {
+      "total": 16.0,
+      "available": 3.2242431640625,
+      "used": 5.579448699951172,
+      "percent_used": 79.8
+    },
+    "gpu": []
+  },
+  "results": [
+    {
+      "model": "wizardlm2",
+      "timing": {
+        "time_to_first_chunk": 3.442692995071411,
+        "total_time": 10.090372800827026,
+        "average_chunk_time": 0.37370377999764903,
+        "max_chunk_time": 3.442692995071411,
+        "min_chunk_time": 0.2110130786895752
+      },
+      "throughput": {
+        "total_chunks": 27,
+        "total_bytes": 113,
+        "average_chunk_size": 4.185185185185185,
+        "bytes_per_second": 11.198793367747355
+      },
+      "system_impact": {
+        "cpu_delta": [
+          -6.199999999999999,
+          -1.0,
+          -5.0,
+          -1.0,
+          -5.199999999999999,
+          0.0,
+          4.5,
+          -1.0
+        ],
+        "memory_delta": -11.700000000000003,
+        "start_metrics": {
+          "cpu_percent": [
+            24.0,
+            2.0,
+            22.0,
+            1.0,
+            17.2,
+            0.0,
+            24.2,
+            1.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 79.8,
+          "swap_percent": 78.7,
+          "disk_usage": 97.8,
+          "network": {
+            "bytes_sent": 221083648,
+            "bytes_recv": 1405760512
+          }
+        },
+        "end_metrics": {
+          "cpu_percent": [
+            17.8,
+            1.0,
+            17.0,
+            0.0,
+            12.0,
+            0.0,
+            28.7,
+            0.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 68.1,
+          "swap_percent": 85.2,
+          "disk_usage": 97.9,
+          "network": {
+            "bytes_sent": 221102080,
+            "bytes_recv": 1405782016
+          }
+        }
+      },
+      "success": true,
+      "timestamp": "2024-12-25T12:33:39.637683"
+    },
+    {
+      "model": "nemotron-mini",
+      "timing": {
+        "time_to_first_chunk": 2.097656011581421,
+        "total_time": 3.248325824737549,
+        "average_chunk_time": 0.32479348182678225,
+        "max_chunk_time": 2.097656011581421,
+        "min_chunk_time": 0.12334108352661133
+      },
+      "throughput": {
+        "total_chunks": 10,
+        "total_bytes": 35,
+        "average_chunk_size": 3.5,
+        "bytes_per_second": 10.77478119142431
+      },
+      "system_impact": {
+        "cpu_delta": [
+          -26.3,
+          -2.0,
+          -5.0,
+          -2.0,
+          -28.5,
+          -5.0,
+          -18.6,
+          -2.0
+        ],
+        "memory_delta": -6.0,
+        "start_metrics": {
+          "cpu_percent": [
+            49.5,
+            3.0,
+            56.0,
+            3.0,
+            45.5,
+            5.0,
+            38.0,
+            4.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 68.0,
+          "swap_percent": 85.2,
+          "disk_usage": 97.9,
+          "network": {
+            "bytes_sent": 221104128,
+            "bytes_recv": 1405787136
+          }
+        },
+        "end_metrics": {
+          "cpu_percent": [
+            23.2,
+            1.0,
+            51.0,
+            1.0,
+            17.0,
+            0.0,
+            19.4,
+            2.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 62.0,
+          "swap_percent": 83.5,
+          "disk_usage": 97.9,
+          "network": {
+            "bytes_sent": 221120512,
+            "bytes_recv": 1405805568
+          }
+        }
+      },
+      "success": true,
+      "timestamp": "2024-12-25T12:33:44.889967"
+    },
+    {
+      "model": "llama3.2",
+      "timing": {
+        "time_to_first_chunk": 1.520583152770996,
+        "total_time": 4.438573122024536,
+        "average_chunk_time": 0.17753081321716307,
+        "max_chunk_time": 1.520583152770996,
+        "min_chunk_time": 0.10612201690673828
+      },
+      "throughput": {
+        "total_chunks": 25,
+        "total_bytes": 95,
+        "average_chunk_size": 3.8,
+        "bytes_per_second": 21.403274743543776
+      },
+      "system_impact": {
+        "cpu_delta": [
+          -17.6,
+          -1.0,
+          -8.2,
+          -1.0,
+          -8.0,
+          -2.0,
+          -10.0,
+          -2.0
+        ],
+        "memory_delta": -1.5,
+        "start_metrics": {
+          "cpu_percent": [
+            39.6,
+            2.0,
+            30.0,
+            2.0,
+            24.0,
+            3.0,
+            20.0,
+            3.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 62.3,
+          "swap_percent": 83.5,
+          "disk_usage": 97.8,
+          "network": {
+            "bytes_sent": 221120512,
+            "bytes_recv": 1405805568
+          }
+        },
+        "end_metrics": {
+          "cpu_percent": [
+            22.0,
+            1.0,
+            21.8,
+            1.0,
+            16.0,
+            1.0,
+            10.0,
+            1.0
+          ],
+          "cpu_freq": 2200,
+          "memory_percent": 60.8,
+          "swap_percent": 83.5,
+          "disk_usage": 97.8,
+          "network": {
+            "bytes_sent": 221143040,
+            "bytes_recv": 1405824000
+          }
+        }
+      },
+      "success": true,
+      "timestamp": "2024-12-25T12:33:51.335693"
+    }
+  ]
+}

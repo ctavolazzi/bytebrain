@@ -1,211 +1,184 @@
 import json
 import os
+import uuid
+import psutil
+import subprocess
 from datetime import datetime
-from typing import Dict, Optional, Any
+from typing import Dict, List, Optional
 
 class SessionManager:
-    """Manages session setup and provides session details to other components."""
+    """Manages chat sessions and their persistence according to TRD specifications."""
 
-    def __init__(self, session_id: str, base_dir: str = "history"):
-        """Initialize the session manager with a session ID."""
-        self.session_id = session_id
-        self.base_dir = base_dir
+    def __init__(self, session_dir: str = "history", version: str = "0.1.0"):
+        """Initialize the session manager.
 
-        # Set up session directory structure
-        self.session_dir = os.path.join(base_dir, "sessions", session_id)
-        self.contexts_dir = os.path.join(base_dir, "contexts", session_id)
+        Args:
+            session_dir: Directory to store session files
+            version: Program version number
+        """
+        self.session_dir = session_dir
+        self.session_id = str(uuid.uuid4())
+        self.current_session: List[Dict] = []
+        self.version = version
 
-        # Create directories
-        os.makedirs(self.session_dir, exist_ok=True)
-        os.makedirs(self.contexts_dir, exist_ok=True)
+        # Create session directory if it doesn't exist
+        os.makedirs(session_dir, exist_ok=True)
 
-        # Define file paths
-        self.session_file = os.path.join(self.session_dir, "session_data.json")
-        self.context_history_file = os.path.join(self.contexts_dir, "chat_context_history.json")
-        self.current_context_file = os.path.join(self.contexts_dir, "current_context.txt")
-        self.full_history_file = os.path.join(base_dir, "full_history.json")
-        self.current_session_file = os.path.join(base_dir, "current_session.txt")
+        # Initialize session file
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.session_file = os.path.join(
+            session_dir,
+            f"session_{self.session_id}_{timestamp}.json"
+        )
+        self._initialize_session_file()
 
-        # Initialize session data
-        self._initialize_session()
-        self._set_as_current()
-
-    def _initialize_session(self) -> None:
-        """Initialize basic session data."""
-        session_data = {
-            "session_id": self.session_id,
-            "session_start": datetime.now().isoformat(),
-            "benchmarks": {
-                "models": {}
-            },
-            "session_totals": {
-                "total_time": 0,
-                "total_chunks": 0,
-                "total_words": 0
-            },
-            "interactions": []
+    def _get_system_metrics(self) -> Dict:
+        """Get current system performance metrics."""
+        process = psutil.Process()
+        return {
+            "cpu_percent": process.cpu_percent(),
+            "mem_usage_mb": process.memory_info().rss / (1024 * 1024),
+            "system_cpu_percent": psutil.cpu_percent(),
+            "system_memory_percent": psutil.virtual_memory().percent
         }
 
-        # Write initial session data
-        with open(self.session_file, "w") as f:
-            json.dump(session_data, f, indent=2)
-
-        # Initialize or update full history
-        self._update_full_history()
-
-    def _set_as_current(self) -> None:
-        """Set this session as the current active session."""
-        os.makedirs(os.path.dirname(self.current_session_file), exist_ok=True)
-        with open(self.current_session_file, "w") as f:
-            f.write(self.session_id)
-
-    def _load_session_data(self) -> Dict:
-        """Load current session data."""
+    def _get_git_info(self) -> Dict:
+        """Get git repository information."""
         try:
-            with open(self.session_file, "r") as f:
-                return json.load(f)
-        except FileNotFoundError:
-            # Reinitialize if missing
-            self._initialize_session()
-            with open(self.session_file, "r") as f:
-                return json.load(f)
-
-    def _save_session_data(self, session_data: Dict) -> None:
-        """Save session data to file."""
-        with open(self.session_file, "w") as f:
-            json.dump(session_data, f, indent=2)
-
-    def _update_full_history(self) -> None:
-        """Update the full history file."""
-        try:
-            with open(self.full_history_file, "r") as f:
-                history = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
-            history = {"sessions": []}
-
-        # Update or add session entry
-        session_entry = {
-            "session_id": self.session_id,
-            "session_start": datetime.now().isoformat(),
-            "session_totals": {
-                "total_time": 0,
-                "total_chunks": 0,
-                "total_words": 0
-            },
-            "interactions": []
-        }
-
-        # Check if session already exists in history
-        for i, session in enumerate(history["sessions"]):
-            if session["session_id"] == self.session_id:
-                history["sessions"][i] = session_entry
-                break
-        else:
-            history["sessions"].append(session_entry)
-
-        # Save updated history
-        with open(self.full_history_file, "w") as f:
-            json.dump(history, f, indent=2)
-
-    def save_interaction(self, prompt: str, model_responses: Dict[str, Any]) -> None:
-        """Save an interaction to the session and update all relevant files."""
-        timestamp = datetime.now()
-
-        # Create interaction entry
-        interaction = {
-            "timestamp": timestamp.isoformat(),
-            "prompt": prompt,
-            "model_responses": {}
-        }
-
-        # Add each model's response and timing
-        for model, result in model_responses.items():
-            interaction["model_responses"][model] = {
-                "response": result["response"],
-                "time_to_first_token": result["time_to_first_token"],
-                "total_time": result["total_time"],
-                "chunk_count": result.get("chunk_count", 0),
-                "word_count": result.get("word_count", 0)
+            commit = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
+            branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode().strip()
+            return {
+                "git_commit": commit,
+                "git_branch": branch
+            }
+        except:
+            return {
+                "git_commit": "unknown",
+                "git_branch": "unknown"
             }
 
-        # Update session data
-        session_data = self._load_session_data()
-
-        # Update session totals
-        for model, result in model_responses.items():
-            session_data["session_totals"]["total_time"] += result.get("total_time", 0)
-            session_data["session_totals"]["total_chunks"] += result.get("chunk_count", 0)
-            session_data["session_totals"]["total_words"] += result.get("word_count", 0)
-
-        # Update session benchmarks
-        for model, result in model_responses.items():
-            if model not in session_data["benchmarks"]["models"]:
-                session_data["benchmarks"]["models"][model] = {
-                    "avg_total_time": result["total_time"],
-                    "avg_first_token": result["time_to_first_token"],
-                    "count": 1,
-                    "total_chunks": result.get("chunk_count", 0)
-                }
-            else:
-                m = session_data["benchmarks"]["models"][model]
-                count = m["count"]
-                m["avg_total_time"] = (m["avg_total_time"] * count + result["total_time"]) / (count + 1)
-                m["avg_first_token"] = (m["avg_first_token"] * count + result["time_to_first_token"]) / (count + 1)
-                m["count"] += 1
-                m["total_chunks"] += result.get("chunk_count", 0)
-
-        # Add interaction to session data
-        session_data["interactions"].append(interaction)
-        self._save_session_data(session_data)
-
-        # Save individual interaction file
-        interaction_file = os.path.join(
-            self.session_dir,
-            f"interaction_{len(session_data['interactions']):04d}.json"
-        )
-        with open(interaction_file, "w") as f:
-            json.dump(interaction, f, indent=2)
-
-        # Update full history
-        try:
-            with open(self.full_history_file, "r") as f:
-                history = json.load(f)
-
-            for session in history["sessions"]:
-                if session["session_id"] == self.session_id:
-                    session["interactions"].append(interaction)
-                    session["session_totals"] = session_data["session_totals"]
-                    break
-
-            with open(self.full_history_file, "w") as f:
-                json.dump(history, f, indent=2)
-        except (FileNotFoundError, json.JSONDecodeError):
-            self._update_full_history()
-
-    def get_session_info(self) -> Dict:
-        """Get session setup information."""
-        return {
+    def _initialize_session_file(self):
+        """Initialize the session file with basic structure."""
+        session_data = {
             "session_id": self.session_id,
-            "session_dir": self.session_dir,
-            "contexts_dir": self.contexts_dir,
-            "session_file": self.session_file,
-            "context_history_file": self.context_history_file,
-            "current_context_file": self.current_context_file
+            "start_time": datetime.now().isoformat(),
+            "interactions": [],
+            "program_info": {
+                "version": self.version,
+                **self._get_git_info()
+            }
         }
 
-    @classmethod
-    def get_current_session(cls, base_dir: str = "history") -> Optional[str]:
-        """Get the current active session ID."""
-        current_session_file = os.path.join(base_dir, "current_session.txt")
-        try:
-            with open(current_session_file, "r") as f:
-                return f.read().strip()
-        except FileNotFoundError:
-            return None
+        with open(self.session_file, 'w') as f:
+            json.dump(session_data, f, indent=2)
 
-    @classmethod
-    def create_new_session(cls, base_dir: str = "history") -> 'SessionManager':
-        """Create a new session with timestamp-based ID."""
-        timestamp = datetime.now()
-        session_id = f"session_{timestamp.strftime('%Y%m%d_%H%M%S')}"
-        return cls(session_id, base_dir)
+    def add_interaction(self, interaction: Dict, chain_steps: Optional[List[Dict]] = None, model_details: Optional[Dict] = None):
+        """Add an interaction to the current session.
+
+        Args:
+            interaction: Dictionary containing interaction details
+            chain_steps: Optional list of agent chain steps
+            model_details: Optional model configuration details
+        """
+        # Add required fields if not present
+        if "id" not in interaction:
+            interaction["id"] = str(uuid.uuid4())
+        if "timestamp" not in interaction:
+            interaction["timestamp"] = datetime.now().isoformat()
+
+        # Add metadata according to TRD
+        interaction["metadata"] = {
+            "session_id": self.session_id,
+            "resource_usage": self._get_system_metrics(),
+            "program_info": {
+                "version": self.version,
+                **self._get_git_info()
+            },
+            "custom_tags": []
+        }
+
+        # Add model details if provided
+        if model_details:
+            interaction["metadata"]["model_details"] = model_details
+
+        # Add chain steps if provided
+        if chain_steps:
+            interaction["chain_steps"] = chain_steps
+
+        self.current_session.append(interaction)
+        self._save_interaction(interaction)
+
+    def _save_interaction(self, interaction: Dict):
+        """Save an interaction to the session file.
+
+        Args:
+            interaction: The interaction to save
+        """
+        with open(self.session_file, 'r+') as f:
+            data = json.load(f)
+            data["interactions"].append(interaction)
+            f.seek(0)
+            json.dump(data, f, indent=2)
+            f.truncate()
+
+    def get_session_summary(self) -> Dict:
+        """Get a summary of the current session.
+
+        Returns:
+            Dictionary containing session summary
+        """
+        return {
+            "session_id": self.session_id,
+            "session_file": self.session_file,
+            "interaction_count": len(self.current_session),
+            "start_time": self.current_session[0]["timestamp"] if self.current_session else None,
+            "last_interaction": self.current_session[-1] if self.current_session else None,
+            "resource_usage": self._get_system_metrics()
+        }
+
+    def load_session(self, session_id: str) -> bool:
+        """Load a previous session.
+
+        Args:
+            session_id: ID of the session to load
+
+        Returns:
+            True if session was loaded successfully, False otherwise
+        """
+        # Find session file
+        for filename in os.listdir(self.session_dir):
+            if session_id in filename and filename.endswith('.json'):
+                filepath = os.path.join(self.session_dir, filename)
+                try:
+                    with open(filepath, 'r') as f:
+                        data = json.load(f)
+                        self.session_id = session_id
+                        self.session_file = filepath
+                        self.current_session = data["interactions"]
+                        return True
+                except Exception as e:
+                    print(f"Error loading session: {e}")
+                    return False
+        return False
+
+    def get_recent_interactions(self, limit: int = 5) -> List[Dict]:
+        """Get the most recent interactions.
+
+        Args:
+            limit: Maximum number of interactions to return
+
+        Returns:
+            List of recent interactions
+        """
+        return self.current_session[-limit:]
+
+    def close_session(self):
+        """Close the current session and update metadata."""
+        with open(self.session_file, 'r+') as f:
+            data = json.load(f)
+            data["end_time"] = datetime.now().isoformat()
+            data["total_interactions"] = len(self.current_session)
+            data["final_resource_usage"] = self._get_system_metrics()
+            f.seek(0)
+            json.dump(data, f, indent=2)
+            f.truncate()

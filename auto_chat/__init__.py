@@ -1,13 +1,6 @@
-from .auto_command import AutoCommandHandler
-from .context_manager import ContextManager
-from .model_handler import ModelHandler
-from .session_manager import SessionManager
-from .turn_manager import TurnManager
+"""Legacy chat automation module."""
 
-__all__ = [
-    'AutoCommandHandler',
-    'ContextManager',
-    'ModelHandler',
-    'SessionManager',
-    'TurnManager'
-]
+from .auto_command import AutoCommandHandler
+from .session_manager import SessionManager
+
+__all__ = ["AutoCommandHandler", "SessionManager"]
