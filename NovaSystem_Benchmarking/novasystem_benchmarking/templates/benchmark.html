@@ -15,9 +15,9 @@
             <div class="relative">
                 <button
                     onclick="toggleRecentBenchmarks()"
-                    class="flex items-center space-x-1.5 px-2.5 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 transition-colors"
+                    class="flex items-center space-x-1.5 px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 transition-colors"
                 >
-                    <span>{{ recent_benchmarks|length }} Recent</span>
+                    <span id="benchmark-count">Loading...</span>
                     <svg class="w-4 h-4 text-gray-400" id="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                     </svg>
@@ -29,11 +29,11 @@
                 <!-- Dropdown Menu -->
                 <div
                     id="recent-benchmarks-dropdown"
-                    class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-xl z-50"
+                    class="hidden fixed right-4 top-20 w-[95vw] max-w-lg bg-white border border-gray-200 rounded-xl shadow-xl z-50"
                 >
                     <div class="p-4">
-                        <div class="flex items-center justify-between mb-3">
-                            <h2 class="text-lg font-semibold">Recent Benchmarks</h2>
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-semibold text-gray-800">Benchmarks</h2>
                             <button
                                 onclick="toggleRecentBenchmarks()"
                                 class="text-gray-400 hover:text-gray-600 focus:outline-none"
@@ -43,25 +43,26 @@
                                 </svg>
                             </button>
                         </div>
-                        {% if recent_benchmarks %}
-                            <div class="space-y-2 max-h-[60vh] overflow-y-auto pr-2 -mr-2">
-                                {% for benchmark in recent_benchmarks %}
-                                <div
-                                    class="p-3 border border-gray-100 rounded-lg hover:bg-gray-50 cursor-pointer transition-all hover:border-gray-200"
-                                    onclick="loadBenchmarkDetails('{{ benchmark.id }}'); closeDropdown();"
-                                >
-                                    <div class="text-sm text-gray-500">
-                                        {{ benchmark.timestamp }}
-                                    </div>
-                                    <div class="font-medium truncate text-gray-700">
-                                        <span class="text-gray-500">Prompt:</span> {{ benchmark.prompt[:50] }}...
-                                    </div>
+                        <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2 -mr-2">
+                            <!-- Recent Benchmarks Section -->
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-500 mb-3 px-1">Recent</h3>
+                                <div id="recent-benchmarks-list" class="space-y-2">
+                                    <!-- Recent benchmarks will be inserted here -->
                                 </div>
-                                {% endfor %}
                             </div>
-                        {% else %}
-                            <div class="text-gray-500 text-sm text-center py-4">No recent benchmarks found</div>
-                        {% endif %}
+
+                            <!-- Divider -->
+                            <div class="border-t border-gray-200"></div>
+
+                            <!-- All Benchmarks Section -->
+                            <div>
+                                <h3 class="text-sm font-semibold text-gray-500 mb-3 px-1">All Benchmarks</h3>
+                                <div id="all-benchmarks-list" class="space-y-2">
+                                    <!-- All benchmarks will be inserted here -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -216,6 +217,103 @@
         <!-- Results Section -->
         <div id="results"></div>
     </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 border-t border-gray-200 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div class="max-w-6xl mx-auto py-8 px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- About Creator -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                        <span class="mr-2">☕</span> Christopher Tavolazzi
+                    </h3>
+                    <p class="text-gray-600 text-sm">
+                        Founder & Creative Visionary behind Nova System. Journalist, PR Expert, and Futurist exploring the intersection of AI, sustainability, and human potential.
+                    </p>
+                    <div class="mt-4 flex space-x-4">
+                        <a href="https://github.com/ctavolazzi" target="_blank" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                        <a href="https://twitter.com/thecoffeejesus" target="_blank" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                        <a href="https://youtube.com/@thecoffeejesus" target="_blank" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Projects -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Featured Projects</h3>
+                    <ul class="space-y-3 text-sm">
+                        <li>
+                            <a href="https://gentlebull.co" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center group">
+                                <span class="mr-2 transform group-hover:scale-110 transition-transform">🐂</span>
+                                <span class="border-b border-transparent group-hover:border-blue-800">Gentle Bull Co</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://johnnyautoseed.com" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center group">
+                                <span class="mr-2 transform group-hover:scale-110 transition-transform">🌱</span>
+                                <span class="border-b border-transparent group-hover:border-blue-800">Johnny Autoseed</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://novasystem.io" target="_blank" class="text-blue-600 hover:text-blue-800 flex items-center group">
+                                <span class="mr-2 transform group-hover:scale-110 transition-transform">🤖</span>
+                                <span class="border-b border-transparent group-hover:border-blue-800">Nova System</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Values & Vision -->
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Values & Vision</h3>
+                    <ul class="space-y-2 text-sm text-gray-600">
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Solarpunk Innovation
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Community Impact
+                        </li>
+                        <li class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Creative Freedom
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Personal Site Link -->
+            <div class="mt-8 pt-8 border-t border-gray-200">
+                <p class="text-center">
+                    <a href="https://thecoffeejesus.com" target="_blank" class="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium">
+                        <span class="mr-2">☕</span>
+                        Visit TheCoffeeJesus.com
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </footer>
 
     <script>
         let isBenchmarking = false;
@@ -388,134 +486,66 @@
             button.disabled = !hasModelsSelected;
         }
 
-        async function runBenchmark() {
-            if (isBenchmarking) return;
-
-            const prompt = document.getElementById('prompt').value;
-            if (!prompt) {
-                alert('Please enter a prompt');
-                return;
-            }
-
-            const modelInputs = document.querySelectorAll('input[name="models"]:checked');
-            const models = Array.from(modelInputs).map(input => input.value);
-            if (models.length === 0) {
-                alert('Please select at least one model');
-                return;
-            }
-
-            // Clear previous output and connect to stream
-            const streamingOutput = document.getElementById('streaming-output');
-            streamingOutput.innerHTML = 'Starting benchmark...\n';
-            connectToStream();
-
-            // Get processing mode
-            const parallelProcessing = document.getElementById('processing-mode').checked;
-
-            // Show loading state
-            isBenchmarking = true;
-            const button = document.getElementById('benchmark-button');
-            const spinner = document.getElementById('spinner');
-            if (button && spinner) {
-                button.disabled = true;
-                spinner.classList.remove('hidden');
-            }
-
-            try {
-                const response = await fetch('/api/benchmarks/run', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        prompt: prompt,
-                        models: models,
-                        parallel_processing: parallelProcessing
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const result = await response.json();
-
-                // Display results in the results section
-                const resultsDiv = document.getElementById('results');
-                if (resultsDiv) {
-                    displayResults(result);
-                }
-
-                // Refresh recent benchmarks
-                await refreshRecentBenchmarks();
-
-            } catch (error) {
-                console.error('Error:', error);
-                const results = document.getElementById('results');
-                if (results) {
-                    results.innerHTML = `
-                        <div class="card error">
-                            <h2 class="text-xl font-bold mb-4 text-red-600">Error</h2>
-                            <div class="text-red-600">${error.message}</div>
-                        </div>
-                    `;
-                }
-            } finally {
-                // Reset all states
-                isBenchmarking = false;
-                const button = document.getElementById('benchmark-button');
-                const spinner = document.getElementById('spinner');
-                if (button && spinner) {
-                    button.disabled = false;
-                    spinner.classList.add('hidden');
-                    // Make sure button state is correct based on model selection
-                    updateButtonState();
-                }
-                // Close the event source
-                if (eventSource) {
-                    eventSource.close();
-                    eventSource = null;
-                }
-            }
-        }
+        // Call refreshRecentBenchmarks immediately when page loads
+        window.addEventListener('DOMContentLoaded', refreshRecentBenchmarks);
 
         async function refreshRecentBenchmarks() {
             try {
-                const response = await fetch('/api/benchmarks/history?limit=5');
+                const response = await fetch('/api/benchmarks/history?limit=50');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const benchmarks = await response.json();
 
                 // Update the count in the button
-                const countSpan = document.querySelector('button span');
+                const countSpan = document.getElementById('benchmark-count');
                 if (countSpan) {
-                    countSpan.textContent = `${benchmarks.length} Recent Benchmarks`;
+                    countSpan.textContent = `${benchmarks.length} Benchmarks`;
                 }
 
-                // Update the dropdown content
-                const listContainer = document.querySelector('#recent-benchmarks-dropdown .space-y-2');
-                if (!listContainer) return;
-
-                if (benchmarks.length === 0) {
-                    listContainer.innerHTML = '<div class="text-gray-500 text-sm">No recent benchmarks found</div>';
-                } else {
-                    listContainer.innerHTML = benchmarks.map(benchmark => `
-                        <div
-                            class="p-3 border rounded hover:bg-gray-50 cursor-pointer transition-colors"
-                            onclick="loadBenchmarkDetails('${benchmark.id}')"
-                        >
-                            <div class="text-sm text-gray-600">
-                                ${benchmark.timestamp}
-                            </div>
-                            <div class="font-medium truncate">
-                                <span class="text-gray-600">Prompt:</span> ${benchmark.prompt.slice(0, 50)}...
-                            </div>
+                // Helper function to create benchmark HTML
+                const createBenchmarkHTML = (benchmark) => `
+                    <div
+                        class="p-4 border border-gray-100 rounded-lg hover:bg-gray-50 cursor-pointer transition-all hover:border-gray-200 hover:shadow-sm"
+                        onclick="loadBenchmarkDetails('${benchmark.id}'); closeDropdown();"
+                    >
+                        <div class="text-sm font-medium text-gray-500 mb-1">
+                            ${new Date(benchmark.timestamp).toLocaleString()}
                         </div>
-                    `).join('');
+                        <div class="font-medium text-gray-700">
+                            <span class="text-gray-500">Prompt:</span> ${benchmark.prompt ? benchmark.prompt.slice(0, 50) + (benchmark.prompt.length > 50 ? '...' : '') : 'No prompt'}
+                        </div>
+                    </div>
+                `;
+
+                // Update recent benchmarks (last 3)
+                const recentList = document.getElementById('recent-benchmarks-list');
+                if (recentList) {
+                    const recentBenchmarks = benchmarks.slice(0, 3);
+                    if (recentBenchmarks.length === 0) {
+                        recentList.innerHTML = '<div class="text-gray-500 text-sm text-center py-3 px-4 bg-gray-50 rounded-lg">No recent benchmarks</div>';
+                    } else {
+                        recentList.innerHTML = recentBenchmarks.map(createBenchmarkHTML).join('');
+                    }
+                }
+
+                // Update all benchmarks (excluding the recent ones)
+                const allList = document.getElementById('all-benchmarks-list');
+                if (allList) {
+                    if (benchmarks.length === 0) {
+                        allList.innerHTML = '<div class="text-gray-500 text-sm text-center py-3 px-4 bg-gray-50 rounded-lg">No benchmarks found</div>';
+                    } else {
+                        // Show all benchmarks except the most recent 3
+                        const olderBenchmarks = benchmarks.slice(3);
+                        if (olderBenchmarks.length === 0) {
+                            allList.innerHTML = '<div class="text-gray-500 text-sm text-center py-3 px-4 bg-gray-50 rounded-lg">No older benchmarks</div>';
+                        } else {
+                            allList.innerHTML = olderBenchmarks.map(createBenchmarkHTML).join('');
+                        }
+                    }
                 }
             } catch (error) {
-                console.error('Error refreshing recent benchmarks:', error);
+                console.error('Error refreshing benchmarks:', error);
             }
         }
 
@@ -777,6 +807,105 @@
 
         // Initialize the prompt library when the page loads
         window.addEventListener('DOMContentLoaded', refreshPromptLibrary);
+
+        async function runBenchmark() {
+            if (isBenchmarking) return;
+
+            const prompt = document.getElementById('prompt').value;
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            // Get selected models
+            const modelInputs = document.querySelectorAll('input[name="models"]:checked');
+            const models = Array.from(modelInputs).map(input => input.value);
+            if (models.length === 0) {
+                alert('Please select at least one model');
+                return;
+            }
+
+            // Get processing mode
+            const parallelProcessing = document.getElementById('processing-mode').checked;
+
+            // Clear previous output and connect to stream
+            const streamingOutput = document.getElementById('streaming-output');
+            streamingOutput.innerHTML = 'Starting benchmark...\n';
+            connectToStream();
+
+            // Scroll to the live output section
+            const liveOutputSection = document.querySelector('.bg-red-50');
+            if (liveOutputSection) {
+                liveOutputSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+
+            // Show loading state
+            isBenchmarking = true;
+            const button = document.getElementById('benchmark-button');
+            const spinner = document.getElementById('spinner');
+            if (button && spinner) {
+                button.disabled = true;
+                spinner.classList.remove('hidden');
+            }
+
+            try {
+                const response = await fetch('/api/benchmarks/run', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        models: models,
+                        parallel_processing: parallelProcessing
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                // Display results in the results section
+                const resultsDiv = document.getElementById('results');
+                if (resultsDiv) {
+                    displayResults(result);
+                }
+
+                // Refresh recent benchmarks after successful run
+                await refreshRecentBenchmarks();
+
+            } catch (error) {
+                console.error('Error:', error);
+                const results = document.getElementById('results');
+                if (results) {
+                    results.innerHTML = `
+                        <div class="card error">
+                            <h2 class="text-xl font-bold mb-4 text-red-600">Error</h2>
+                            <div class="text-red-600">${error.message}</div>
+                        </div>
+                    `;
+                }
+            } finally {
+                // Reset all states
+                isBenchmarking = false;
+                if (button && spinner) {
+                    button.disabled = false;
+                    spinner.classList.add('hidden');
+                    // Make sure button state is correct based on model selection
+                    updateButtonState();
+                }
+                // Close the event source
+                if (eventSource) {
+                    eventSource.close();
+                    eventSource = null;
+                }
+            }
+        }
     </script>
 </body>
 </html>

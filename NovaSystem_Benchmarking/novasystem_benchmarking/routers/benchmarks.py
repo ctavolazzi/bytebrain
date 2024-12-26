@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 # Set up directories
 PACKAGE_DIR = os.path.dirname(os.path.dirname(__file__))
-BENCHMARKS_DIR = os.path.join(PACKAGE_DIR, "data", "benchmarks")
+BENCHMARKS_DIR = "/Users/ctavolazzi/Code/bytebrain/NovaSystem_Benchmarking/novasystem_benchmarking/data/benchmarks"
 PROMPT_LIBRARY_PATH = os.path.join(PACKAGE_DIR, "data", "prompt_library.json")
 os.makedirs(BENCHMARKS_DIR, exist_ok=True)
 logger.info(f"Using benchmarks directory: {BENCHMARKS_DIR}")
@@ -172,7 +172,7 @@ async def get_benchmark_ui(request: Request):
     try:
         # Get list of recent benchmarks for display
         logger.info("Fetching recent benchmarks for UI")
-        recent_benchmarks = await get_benchmark_history(limit=5)
+        recent_benchmarks = await get_benchmark_history(limit=50)
         logger.info(f"Found {len(recent_benchmarks)} recent benchmarks")
         return templates.TemplateResponse(
             "benchmark.html",
