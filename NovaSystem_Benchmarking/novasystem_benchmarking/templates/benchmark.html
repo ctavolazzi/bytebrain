@@ -113,7 +113,7 @@
                                 placeholder="Enter your prompt here..."
                                 onblur="savePromptIfNew(this.value)"
                                 onkeydown="handleKeyPress(event)"
-                            >Repeat this sentence: The QUICK brown Fox Jumps Over The Lazy Dog</textarea>
+                            >The QUICK brown Fox Jumps Over The Lazy Dog</textarea>
                         </div>
 
                         <div>
@@ -206,10 +206,16 @@
 
         <!-- LIVE STREAMING OUTPUT -->
         <div class="mt-8">
-            <div class="bg-red-50 border-2 border-red-500 rounded-lg overflow-hidden">
+            <div class="bg-red-50 border-2 border-red-500 rounded-lg overflow-hidden relative">
                 <h2 class="text-2xl font-bold text-center bg-red-100 py-4 border-b-2 border-red-500">🔴 LIVE MODEL OUTPUT 🔴</h2>
                 <div id="streaming-output" class="p-4 bg-white font-mono text-sm whitespace-pre-wrap h-96 overflow-auto">
                     Waiting for model output...
+                </div>
+                <!-- Floating scroll-to-bottom button -->
+                <div id="scroll-to-bottom" class="hidden absolute bottom-4 left-1/2 transform -translate-x-1/2 p-3 bg-white rounded-full shadow-lg cursor-pointer hover:bg-gray-50 hover:shadow-xl transition-all duration-200">
+                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
                 </div>
             </div>
         </div>
@@ -318,6 +324,7 @@
     <script>
         let isBenchmarking = false;
         let eventSource = null;
+        let autoScrollEnabled = true;  // Track if auto-scroll is enabled
 
         // Function to connect to the streaming endpoint
         function connectToStream() {
@@ -327,6 +334,38 @@
 
             eventSource = new EventSource('/api/benchmarks/stream');
             const streamingOutput = document.getElementById('streaming-output');
+            const scrollButton = document.getElementById('scroll-to-bottom');
+
+            // Add scroll event listener to detect manual scrolling
+            streamingOutput.addEventListener('scroll', () => {
+                const isAtBottom = Math.abs(streamingOutput.scrollHeight - streamingOutput.scrollTop - streamingOutput.clientHeight) < 10;
+
+                if (!isAtBottom && autoScrollEnabled) {
+                    // User has scrolled up, disable auto-scroll and show button
+                    autoScrollEnabled = false;
+                    scrollButton.classList.remove('hidden');
+                }
+            });
+
+            // Add click handler for the scroll button
+            scrollButton.addEventListener('click', () => {
+                // Scroll to bottom of streaming output
+                streamingOutput.scrollTop = streamingOutput.scrollHeight;
+
+                // Center the streaming output section in viewport
+                const liveOutputSection = document.querySelector('.bg-red-50');
+                if (liveOutputSection) {
+                    liveOutputSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+
+                // Re-enable auto-scroll
+                autoScrollEnabled = true;
+                // Hide the button
+                scrollButton.classList.add('hidden');
+            });
 
             eventSource.onmessage = function(event) {
                 try {
@@ -351,8 +390,10 @@
                             break;
                     }
 
-                    // Auto-scroll to bottom
-                    streamingOutput.scrollTop = streamingOutput.scrollHeight;
+                    // Only auto-scroll if enabled
+                    if (autoScrollEnabled) {
+                        streamingOutput.scrollTop = streamingOutput.scrollHeight;
+                    }
                 } catch (error) {
                     console.error('Error handling stream update:', error);
                 }
@@ -806,7 +847,28 @@
         }
 
         // Initialize the prompt library when the page loads
-        window.addEventListener('DOMContentLoaded', refreshPromptLibrary);
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshPromptLibrary();
+            refreshRecentBenchmarks();
+
+            // Auto-select all models
+            const checkboxes = document.querySelectorAll('input[name="models"]');
+            checkboxes.forEach(checkbox => checkbox.checked = true);
+
+            // Update button state to enable it
+            updateButtonState();
+
+            // Focus the prompt textarea and ensure it has a default value
+            const promptArea = document.getElementById('prompt');
+            if (promptArea) {
+                if (!promptArea.value) {
+                    promptArea.value = 'The QUICK brown Fox Jumps Over The Lazy Dog';
+                }
+                promptArea.focus();
+                // Place cursor at end of text
+                promptArea.setSelectionRange(promptArea.value.length, promptArea.value.length);
+            }
+        });
 
         async function runBenchmark() {
             if (isBenchmarking) return;

@@ -51,6 +51,16 @@
       "name": "Custom Prompt 4",
       "prompt": "Repeat this sentence: The QUICK brown Fox Jumps Over The Lazy Dog",
       "category": "Custom"
+    },
+    {
+      "name": "Custom Prompt 5",
+      "prompt": "Explain how this sorting algorithm works:\n\ndef quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quicksort(left) + middle + quicksort(right)",
+      "category": "Custom"
+    },
+    {
+      "name": "Custom Prompt 6",
+      "prompt": "The QUICK brown Fox Jumps Over The Lazy Dog",
+      "category": "Custom"
     }
   ]
 }
