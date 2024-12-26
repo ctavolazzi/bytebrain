@@ -1,4 +1,6 @@
 import ollama
+
+
 from typing import AsyncGenerator, Dict, Optional, Union
 
 class OllamaBot:

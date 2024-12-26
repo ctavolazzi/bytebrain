@@ -61,6 +61,16 @@
       "name": "Custom Prompt 6",
       "prompt": "The QUICK brown Fox Jumps Over The Lazy Dog",
       "category": "Custom"
+    },
+    {
+      "name": "Custom Prompt 7",
+      "prompt": "Generate a detailed 500-word essay about the history of artificial intelligence, including key milestones, important researchers, and major breakthroughs.",
+      "category": "Custom"
+    },
+    {
+      "name": "Custom Prompt 8",
+      "prompt": "Tell me everything you know about the JFK assasination",
+      "category": "Custom"
     }
   ]
 }

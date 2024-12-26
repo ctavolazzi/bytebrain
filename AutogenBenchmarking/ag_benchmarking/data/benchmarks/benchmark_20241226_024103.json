@@ -1,0 +1,14 @@
+{
+  "prompt": "Hello, how are you?",
+  "processing_mode": "sequential",
+  "parameters": null,
+  "system_info": {},
+  "results": [
+    {
+      "success": false,
+      "error": "Conversation failed: 'GroupChat' object has no attribute 'initiate_chat'",
+      "timestamp": "2024-12-26T02:41:03.419579"
+    }
+  ],
+  "timestamp": "2024-12-26T02:41:03.419590"
+}

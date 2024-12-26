@@ -1,18 +1,24 @@
-"""Async client for Ollama API."""
+"""Async client for Ollama API with OpenAI compatibility."""
 import json
 import aiohttp
-from typing import AsyncGenerator, Dict, List, Optional
+from typing import AsyncGenerator, Dict, List, Optional, Union
 
 class OllamaError(Exception):
     """Ollama API error."""
     pass
 
 class OllamaClient:
-    """Async client for Ollama API."""
+    """Async client for Ollama API with OpenAI compatibility."""
 
-    def __init__(self, host: str = "http://localhost:11434"):
-        """Initialize the client with the Ollama API host."""
+    def __init__(self, host: str = "http://localhost:11434", use_openai_compat: bool = False):
+        """Initialize the client with the Ollama API host.
+
+        Args:
+            host: Base URL for Ollama API
+            use_openai_compat: Whether to use OpenAI-compatible endpoints
+        """
         self.host = host.rstrip("/")
+        self.use_openai_compat = use_openai_compat
 
     async def chat(
         self,
@@ -22,7 +28,10 @@ class OllamaClient:
         **kwargs
     ) -> AsyncGenerator[Dict, None]:
         """Send a chat request to Ollama API."""
-        url = f"{self.host}/api/chat"
+        if self.use_openai_compat:
+            url = f"{self.host}/v1/chat/completions"
+        else:
+            url = f"{self.host}/api/chat"
 
         payload = {
             "model": model,
@@ -39,19 +48,35 @@ class OllamaClient:
                         raise OllamaError(f"Ollama API error: {response.status} - {error_text}")
 
                     if stream:
-                        # Process streaming response
                         async for line in response.content:
                             line = line.strip()
                             if line:  # Skip empty lines
                                 try:
                                     chunk = json.loads(line)
-                                    yield chunk
+                                    if self.use_openai_compat:
+                                        # Transform OpenAI format to Ollama format
+                                        if "choices" in chunk and chunk["choices"]:
+                                            yield {
+                                                "message": {
+                                                    "content": chunk["choices"][0]["delta"].get("content", "")
+                                                }
+                                            }
+                                    else:
+                                        yield chunk
                                 except json.JSONDecodeError as e:
                                     raise OllamaError(f"Failed to parse response: {e}")
                     else:
-                        # Process non-streaming response
                         result = await response.json()
-                        yield result
+                        if self.use_openai_compat:
+                            # Transform OpenAI format to Ollama format
+                            if "choices" in result and result["choices"]:
+                                yield {
+                                    "message": {
+                                        "content": result["choices"][0]["message"]["content"]
+                                    }
+                                }
+                        else:
+                            yield result
 
         except aiohttp.ClientError as e:
             raise OllamaError(f"Failed to connect to Ollama API: {e}")
@@ -60,7 +85,10 @@ class OllamaClient:
 
     async def list_models(self) -> List[str]:
         """Get list of available models."""
-        url = f"{self.host}/api/tags"
+        if self.use_openai_compat:
+            url = f"{self.host}/v1/models"
+        else:
+            url = f"{self.host}/api/tags"
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -70,7 +98,10 @@ class OllamaClient:
                         raise OllamaError(f"Ollama API error: {response.status} - {error_text}")
 
                     result = await response.json()
-                    return [model["name"] for model in result["models"]]
+                    if self.use_openai_compat:
+                        return [model["id"] for model in result["data"]]
+                    else:
+                        return [model["name"] for model in result["models"]]
 
         except aiohttp.ClientError as e:
             raise OllamaError(f"Failed to connect to Ollama API: {e}")

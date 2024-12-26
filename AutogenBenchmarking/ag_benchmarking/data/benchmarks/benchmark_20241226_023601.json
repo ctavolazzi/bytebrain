@@ -1,0 +1,14 @@
+{
+  "prompt": "test",
+  "processing_mode": "sequential",
+  "parameters": null,
+  "system_info": {},
+  "results": [
+    {
+      "success": false,
+      "error": "Conversation failed: Failed to create agent: Code execution is set to be run in docker (default behaviour) but docker is not running.\nThe options available are:\n- Make sure docker is running (advised approach for code execution)\n- Set \"use_docker\": False in code_execution_config\n- Set AUTOGEN_USE_DOCKER to \"0/False/no\" in your environment variables",
+      "timestamp": "2024-12-26T02:36:01.746269"
+    }
+  ],
+  "timestamp": "2024-12-26T02:36:01.746278"
+}

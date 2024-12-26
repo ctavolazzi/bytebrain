@@ -1,0 +1,14 @@
+{
+  "prompt": "Hello, how are you?",
+  "processing_mode": "sequential",
+  "parameters": null,
+  "system_info": {},
+  "results": [
+    {
+      "success": false,
+      "error": "Conversation failed: 'GroupChatManager' object has no attribute 'messages'",
+      "timestamp": "2024-12-26T02:44:44.581490"
+    }
+  ],
+  "timestamp": "2024-12-26T02:44:44.581507"
+}

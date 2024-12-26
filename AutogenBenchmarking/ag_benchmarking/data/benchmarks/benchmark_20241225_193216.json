@@ -1,0 +1,38 @@
+{
+  "prompt": "What is 2+2?",
+  "processing_mode": "sequential",
+  "parameters": null,
+  "system_info": {
+    "platform": "macOS-12.7.4-x86_64-i386-64bit",
+    "python_version": "3.10.0",
+    "cpu": {
+      "physical_cores": 4,
+      "total_cores": 8,
+      "max_frequency": 2200,
+      "min_frequency": 2200,
+      "current_frequency": 2200
+    },
+    "memory": {
+      "total": 16.0,
+      "available": 8.826690673828125,
+      "used": 5.174335479736328,
+      "percent_used": 44.8
+    },
+    "timestamp": "2024-12-25 19:32:16.574927"
+  },
+  "results": [
+    {
+      "config_name": "test",
+      "success": false,
+      "timing": {
+        "total_time": 0.0,
+        "error": "The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable"
+      },
+      "metrics": null,
+      "system_impact": null,
+      "timestamp": "2024-12-25 19:32:16.575065",
+      "error": "The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable"
+    }
+  ],
+  "timestamp": "2024-12-25 19:32:16.575080"
+}

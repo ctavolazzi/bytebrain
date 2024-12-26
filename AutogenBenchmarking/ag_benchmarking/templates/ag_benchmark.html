@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Autogen Benchmark Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .benchmark-list {
+            list-style: none;
+            padding: 0;
+        }
+        .benchmark-item {
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .benchmark-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .status-success { color: green; }
+        .status-error { color: red; }
+        .status-running { color: blue; }
+        .timestamp { color: #666; }
+        .duration { font-weight: bold; }
+        pre {
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Autogen Benchmark Results</h1>
+        {% if benchmarks %}
+        <ul class="benchmark-list">
+            {% for benchmark in benchmarks %}
+            <li class="benchmark-item">
+                <div class="benchmark-header">
+                    <h3>{{ benchmark.name if benchmark.name else "Unnamed Benchmark" }}</h3>
+                    <span class="timestamp">{{ benchmark.timestamp }}</span>
+                </div>
+                <div>
+                    <span class="status-{{ benchmark.status.lower() }}">Status: {{ benchmark.status }}</span>
+                    {% if benchmark.duration %}
+                    <span class="duration"> | Duration: {{ benchmark.duration }}s</span>
+                    {% endif %}
+                </div>
+                {% if benchmark.description %}
+                <p>{{ benchmark.description }}</p>
+                {% endif %}
+                {% if benchmark.results %}
+                <pre>{{ benchmark.results | tojson(indent=2) }}</pre>
+                {% endif %}
+                {% if benchmark.error %}
+                <pre class="status-error">{{ benchmark.error }}</pre>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No benchmarks found.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

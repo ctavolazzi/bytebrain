@@ -1,0 +1,14 @@
+{
+  "prompt": "What is 2+2?",
+  "processing_mode": "sequential",
+  "parameters": null,
+  "system_info": {},
+  "results": [
+    {
+      "success": false,
+      "error": "Conversation failed: Failed to create agent: 'AgentConfig' object has no attribute 'llm_config'",
+      "timestamp": "2024-12-26T02:32:32.147651"
+    }
+  ],
+  "timestamp": "2024-12-26T02:32:32.147662"
+}

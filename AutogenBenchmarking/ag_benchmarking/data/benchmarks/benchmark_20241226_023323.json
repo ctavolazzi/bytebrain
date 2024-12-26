@@ -1,0 +1,14 @@
+{
+  "prompt": "What is 2+2?",
+  "processing_mode": "sequential",
+  "parameters": null,
+  "system_info": {},
+  "results": [
+    {
+      "success": false,
+      "error": "Conversation failed: Failed to create agent: The api_key client option must be set either by passing api_key to the client or by setting the OPENAI_API_KEY environment variable",
+      "timestamp": "2024-12-26T02:33:23.437250"
+    }
+  ],
+  "timestamp": "2024-12-26T02:33:23.437263"
+}

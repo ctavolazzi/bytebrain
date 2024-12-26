@@ -1,0 +1,35 @@
+{
+  "prompt": "What is the capital of France?",
+  "configs": [
+    {
+      "name": "ollama_test",
+      "description": "Basic conversation using Ollama LLM",
+      "agents": [
+        {
+          "name": "assistant",
+          "type": "assistant",
+          "llm_config": {
+            "config_list": [
+              {
+                "model": "wizardlm2",
+                "base_url": "http://localhost:11434/v1",
+                "api_key": "ollama"
+              }
+            ],
+            "temperature": 0.7,
+            "timeout": 60
+          },
+          "system_message": "You are a helpful AI assistant."
+        },
+        {
+          "name": "user",
+          "type": "user_proxy",
+          "system_message": "You are a user seeking assistance."
+        }
+      ],
+      "initiator": "user",
+      "max_rounds": 3
+    }
+  ],
+  "parallel_processing": false
+}

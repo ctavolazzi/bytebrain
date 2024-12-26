@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoGen Benchmarking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes shine {
+            to {
+                transform: translateX(200%) skewX(-12deg);
+            }
+        }
+        .animate-shine {
+            animation: shine 1.5s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">AutoGen Benchmarking</h1>
+            <div class="flex items-center space-x-4">
+                <span id="status-indicator" class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    System Ready
+                </span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Configuration Panel -->
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Configuration</h2>
+
+                    <!-- Model Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Available Models</label>
+                        <div class="space-y-2" id="model-list">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="wizardlm2" name="models" value="wizardlm2" class="h-4 w-4 text-blue-600" checked>
+                                <label for="wizardlm2" class="ml-2 text-sm text-gray-700">WizardLM 2</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="nemotron-mini" name="models" value="nemotron-mini" class="h-4 w-4 text-blue-600" checked>
+                                <label for="nemotron-mini" class="ml-2 text-sm text-gray-700">Nemotron Mini</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="llama3.2" name="models" value="llama3.2" class="h-4 w-4 text-blue-600" checked>
+                                <label for="llama3.2" class="ml-2 text-sm text-gray-700">Llama 3.2</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Processing Options -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Processing Options</label>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-700">Parallel Processing</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="parallel-processing" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-700">Stream Output</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="stream-output" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Benchmarks -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Recent Benchmarks</h2>
+                    <div id="recent-benchmarks" class="space-y-4">
+                        <!-- Recent benchmarks will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benchmark Input and Results -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Input Section -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Benchmark Input</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="prompt" class="block text-sm font-medium text-gray-700 mb-2">Prompt</label>
+                            <textarea
+                                id="prompt"
+                                rows="4"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter your prompt here..."
+                            ></textarea>
+                        </div>
+                        <div>
+                            <button
+                                id="run-benchmark"
+                                onclick="runBenchmark()"
+                                class="w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                            >
+                                Run Benchmark
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Results</h2>
+                    <div id="results" class="space-y-4">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Live Output -->
+                <div class="bg-white rounded-lg shadow p-6">
+                    <h2 class="text-xl font-semibold mb-4">Live Output</h2>
+                    <pre id="live-output" class="bg-gray-50 p-4 rounded-lg text-sm font-mono whitespace-pre-wrap max-h-96 overflow-y-auto"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentBenchmark = null;
+
+        async function runBenchmark() {
+            const prompt = document.getElementById('prompt').value.trim();
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            const selectedModels = Array.from(document.querySelectorAll('input[name="models"]:checked'))
+                .map(input => input.value);
+            if (selectedModels.length === 0) {
+                alert('Please select at least one model');
+                return;
+            }
+
+            const parallelProcessing = document.getElementById('parallel-processing').checked;
+            const streamOutput = document.getElementById('stream-output').checked;
+
+            // Clear previous output
+            document.getElementById('live-output').textContent = '';
+            document.getElementById('results').innerHTML = '';
+
+            // Update UI state
+            document.getElementById('run-benchmark').disabled = true;
+            document.getElementById('status-indicator').className = 'px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800';
+            document.getElementById('status-indicator').textContent = 'Running Benchmark';
+
+            try {
+                const response = await fetch('/api/benchmarks/run', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt,
+                        models: selectedModels,
+                        parallel_processing: parallelProcessing,
+                        stream: streamOutput
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                currentBenchmark = data.benchmark_id;
+
+                if (streamOutput) {
+                    connectToStream(data.benchmark_id);
+                }
+
+                // Start polling for results
+                pollResults(data.benchmark_id);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('live-output').textContent = `Error: ${error.message}`;
+                resetUI();
+            }
+        }
+
+        function connectToStream(benchmarkId) {
+            const evtSource = new EventSource(`/api/benchmarks/stream/${benchmarkId}`);
+            const outputElement = document.getElementById('live-output');
+
+            evtSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                outputElement.textContent += data.content + '\n';
+                outputElement.scrollTop = outputElement.scrollHeight;
+            };
+
+            evtSource.onerror = function(error) {
+                console.error('EventSource error:', error);
+                evtSource.close();
+            };
+        }
+
+        async function pollResults(benchmarkId) {
+            const pollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/benchmarks/${benchmarkId}`);
+                    const data = await response.json();
+
+                    if (data.status === 'completed') {
+                        clearInterval(pollInterval);
+                        displayResults(data);
+                        resetUI();
+                        refreshRecentBenchmarks();
+                    } else if (data.status === 'failed') {
+                        clearInterval(pollInterval);
+                        document.getElementById('results').innerHTML = `
+                            <div class="bg-red-50 p-4 rounded-lg">
+                                <h3 class="text-red-800 font-medium">Benchmark Failed</h3>
+                                <p class="text-red-700 mt-2">${data.error || 'Unknown error occurred'}</p>
+                            </div>
+                        `;
+                        resetUI();
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                    clearInterval(pollInterval);
+                    resetUI();
+                }
+            }, 1000);
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="space-y-6">
+                    <!-- System Info -->
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h3 class="font-medium text-gray-900 mb-2">System Information</h3>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-500">Platform:</span>
+                                <span class="font-medium">${data.system_info.platform}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Python Version:</span>
+                                <span class="font-medium">${data.system_info.python_version}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Model Results -->
+                    ${data.results.map(result => `
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-medium text-lg">${result.model}</h3>
+                                <span class="px-2 py-1 rounded-full text-sm ${
+                                    result.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                }">${result.success ? 'Success' : 'Failed'}</span>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Time:</span>
+                                    <span class="font-medium">${result.time.toFixed(2)}s</span>
+                                </div>
+                                <div class="text-sm">
+                                    <span class="text-gray-500">Tokens:</span>
+                                    <span class="font-medium">${result.tokens}</span>
+                                </div>
+                                <div class="mt-4">
+                                    <div class="text-sm text-gray-500 mb-1">Response:</div>
+                                    <pre class="bg-gray-50 p-3 rounded text-sm overflow-x-auto">${result.response}</pre>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function refreshRecentBenchmarks() {
+            try {
+                const response = await fetch('/api/benchmarks/recent');
+                const data = await response.json();
+
+                const recentDiv = document.getElementById('recent-benchmarks');
+                recentDiv.innerHTML = data.length ? data.map(benchmark => `
+                    <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                         onclick="loadBenchmark('${benchmark.id}')">
+                        <div class="text-sm text-gray-500">${new Date(benchmark.timestamp).toLocaleString()}</div>
+                        <div class="font-medium truncate">${benchmark.prompt}</div>
+                        <div class="text-sm text-gray-500 mt-1">${benchmark.models.join(', ')}</div>
+                    </div>
+                `).join('') : '<div class="text-gray-500 text-sm">No recent benchmarks</div>';
+            } catch (error) {
+                console.error('Error refreshing recent benchmarks:', error);
+            }
+        }
+
+        function resetUI() {
+            document.getElementById('run-benchmark').disabled = false;
+            document.getElementById('status-indicator').className = 'px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800';
+            document.getElementById('status-indicator').textContent = 'System Ready';
+        }
+
+        async function loadBenchmark(benchmarkId) {
+            try {
+                const response = await fetch(`/api/benchmarks/${benchmarkId}`);
+                const data = await response.json();
+                displayResults(data);
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                console.error('Error loading benchmark:', error);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshRecentBenchmarks();
+
+            // Set default prompt
+            const promptArea = document.getElementById('prompt');
+            if (!promptArea.value) {
+                promptArea.value = 'What is the capital of France?';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{
+  "prompt": "test",
+  "processing_mode": "sequential",
+  "parameters": null,
+  "system_info": {},
+  "results": [
+    {
+      "success": false,
+      "error": "Conversation failed: 'GroupChat' object has no attribute 'initiate_chat'",
+      "timestamp": "2024-12-26T02:36:42.785245"
+    }
+  ],
+  "timestamp": "2024-12-26T02:36:42.785259"
+}

@@ -1,0 +1,16 @@
+configurations:
+  - name: ollama_test
+    description: Basic conversation using Ollama LLM
+    agents:
+      - name: assistant
+        type: assistant
+        llm_config:
+          provider: ollama
+          model: wizardlm2
+          base_url: http://localhost:11434
+        system_message: You are a helpful AI assistant.
+      - name: user
+        type: user_proxy
+        system_message: You are a user seeking assistance.
+    initiator: user
+    max_rounds: 3

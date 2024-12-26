@@ -1,0 +1,14 @@
+{
+  "prompt": "Hello, how are you?",
+  "processing_mode": "sequential",
+  "parameters": null,
+  "system_info": {},
+  "results": [
+    {
+      "success": false,
+      "error": "Conversation failed: GroupChatManager.__init__() missing 1 required positional argument: 'groupchat'",
+      "timestamp": "2024-12-26T02:42:22.801050"
+    }
+  ],
+  "timestamp": "2024-12-26T02:42:22.801060"
+}

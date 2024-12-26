@@ -1,41 +1,26 @@
 [tool.poetry]
-name = "ollama_model_benchmarker"
+name = "ag-benchmarking"
 version = "0.1.0"
-description = "A benchmarking tool for Ollama models with parallel and sequential testing capabilities"
-authors = ["Christopher Tavolazzi <ctavolazzi@gmail.com>"]
-readme = "README.md"
-packages = [
-    {include = "app"},
-    {include = "bots"},
-    {include = "auto_chat"},
-    {include = "ollama_client.py"}
-]
+description = "A benchmarking system for Autogen agents and conversations"
+authors = ["Your Name <your.email@example.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.14"
-ollama = "^0.1.9"
-psutil = "^5.9.0"
-pyautogen = "^0.6.0"
-fix-busted-json = "^0.0.18"
-streamlit = "^1.41.1"
-gputil = "^1.4.0"
-flask = "^3.1.0"
-fastapi = "^0.109.0"
-uvicorn = "^0.25.0"
-motor = "^3.3.2"
+python = ">=3.9,<3.13"
+fastapi = "^0.104.1"
+uvicorn = "^0.24.0"
+pydantic = "^2.4.2"
+pyautogen = {extras = ["ollama"], version = "^0.2.0"}
+python-dotenv = "^1.0.0"
+psutil = "^5.9.6"
+anthropic = "^0.5.0"
+openai = "^1.3.0"
+python-multipart = "^0.0.6"
 jinja2 = "^3.1.2"
-aiohttp = "^3.9.1"
-httpx = "^0.27.0"
-fastapi-cache2 = "^0.2.2"
+sse-starlette = "^1.6.5"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^7.4.0"
-pytest-asyncio = "^0.21.0"
-
-[tool.poetry.group.test.dependencies]
-pytest = "^7.4.0"
-pytest-asyncio = "^0.21.0"
-httpx = "^0.27.0"
+pytest = "^7.4.3"
+httpx = "^0.25.1"
 
 [build-system]
 requires = ["poetry-core"]
