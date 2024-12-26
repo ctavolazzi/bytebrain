@@ -1,0 +1,33 @@
+[tool.poetry]
+name = "novasystem-benchmarking"
+version = "0.1.0"
+description = "A modular benchmarking system for LLM models using Ollama"
+authors = ["ByteBrain Team"]
+readme = "README.md"
+packages = [{include = "novasystem_benchmarking"}]
+include = ["novasystem_benchmarking/data/benchmarks/.gitkeep"]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<4.0"
+fastapi = "^0.109.0"
+aiohttp = "^3.9.1"
+jinja2 = "^3.1.2"
+python-multipart = "^0.0.6"
+psutil = "^5.9.6"
+gputil = "^1.4.0"
+uvicorn = "^0.24.0"
+click = "^8.1.7"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.3"
+pytest-asyncio = "^0.21.1"
+black = "^23.11.0"
+isort = "^5.12.0"
+mypy = "^1.7.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+novasystem-benchmark = "novasystem_benchmarking.cli:main"

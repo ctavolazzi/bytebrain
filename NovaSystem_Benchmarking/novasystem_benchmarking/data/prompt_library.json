@@ -1,0 +1,41 @@
+{
+  "default_prompts": [
+    {
+      "name": "Quick Brown Fox",
+      "prompt": "Repeat this sentence: The QUICK brown Fox Jumps Over The Lazy Dog",
+      "category": "Basic"
+    },
+    {
+      "name": "Code Explanation",
+      "prompt": "Explain how this sorting algorithm works:\n\ndef quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quicksort(left) + middle + quicksort(right)",
+      "category": "Programming"
+    },
+    {
+      "name": "Story Generation",
+      "prompt": "Write a short story about an AI that learns to feel emotions.",
+      "category": "Creative"
+    },
+    {
+      "name": "Mathematical Reasoning",
+      "prompt": "If a train travels at 60 mph for 2.5 hours, then at 75 mph for 1.5 hours, what is the total distance traveled?",
+      "category": "Problem Solving"
+    },
+    {
+      "name": "System Design",
+      "prompt": "Design a scalable chat application that can handle millions of concurrent users. Consider the database design, API architecture, and deployment strategy.",
+      "category": "Technical"
+    },
+    {
+      "name": "Token Stress Test",
+      "prompt": "Generate a detailed 500-word essay about the history of artificial intelligence, including key milestones, important researchers, and major breakthroughs.",
+      "category": "Performance"
+    }
+  ],
+  "user_prompts": [
+    {
+      "name": "Custom Prompt 1",
+      "prompt": "Count from 1 to 10",
+      "category": "Custom"
+    }
+  ]
+}

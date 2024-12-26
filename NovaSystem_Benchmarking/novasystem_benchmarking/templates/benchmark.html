@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NovaSystem Benchmarking</title>
+    <link href="/static/style.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAA/4QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEREQAAAAAAEAAAEAAAAAEAAAABAAAAEAAAAAAQAAAQAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAEAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD8HwAA++8AAPf3AADv+wAA7/sAAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between mb-8">
+            <h1 class="text-3xl font-bold">NovaSystem Benchmarking</h1>
+            <div class="relative">
+                <button
+                    onclick="toggleRecentBenchmarks()"
+                    class="flex items-center space-x-1.5 px-2.5 py-1.5 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500 transition-colors"
+                >
+                    <span>{{ recent_benchmarks|length }} Recent</span>
+                    <svg class="w-4 h-4 text-gray-400" id="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                <!-- Backdrop -->
+                <div id="dropdown-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm z-40" onclick="toggleRecentBenchmarks()"></div>
+
+                <!-- Dropdown Menu -->
+                <div
+                    id="recent-benchmarks-dropdown"
+                    class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-white border border-gray-200 rounded-xl shadow-xl z-50"
+                >
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h2 class="text-lg font-semibold">Recent Benchmarks</h2>
+                            <button
+                                onclick="toggleRecentBenchmarks()"
+                                class="text-gray-400 hover:text-gray-600 focus:outline-none"
+                            >
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        {% if recent_benchmarks %}
+                            <div class="space-y-2 max-h-[60vh] overflow-y-auto pr-2 -mr-2">
+                                {% for benchmark in recent_benchmarks %}
+                                <div
+                                    class="p-3 border border-gray-100 rounded-lg hover:bg-gray-50 cursor-pointer transition-all hover:border-gray-200"
+                                    onclick="loadBenchmarkDetails('{{ benchmark.id }}'); closeDropdown();"
+                                >
+                                    <div class="text-sm text-gray-500">
+                                        {{ benchmark.timestamp }}
+                                    </div>
+                                    <div class="font-medium truncate text-gray-700">
+                                        <span class="text-gray-500">Prompt:</span> {{ benchmark.prompt[:50] }}...
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="text-gray-500 text-sm text-center py-4">No recent benchmarks found</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Benchmark Form -->
+            <div class="lg:col-span-3">
+                <div class="card">
+                    <h2 class="text-xl font-bold mb-4">Run Benchmark</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="prompt" class="block text-sm font-medium text-gray-700 mb-1">Prompt</label>
+                            <div class="space-y-2 mb-2">
+                                <!-- Default Prompts Dropdown -->
+                                <div class="flex space-x-2">
+                                    <select
+                                        id="default-prompts"
+                                        class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        onchange="selectPrompt(event, 'default')"
+                                    >
+                                        <option value="">Select from Default Prompts...</option>
+                                    </select>
+                                </div>
+
+                                <!-- User Prompts Dropdown -->
+                                <div class="flex space-x-2">
+                                    <select
+                                        id="user-prompts"
+                                        class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        onchange="selectPrompt(event, 'user')"
+                                    >
+                                        <option value="">Select from User Prompts...</option>
+                                    </select>
+                                    <button
+                                        onclick="clearUserPrompts()"
+                                        class="px-3 py-2 text-sm text-red-600 hover:text-red-700 font-medium hover:bg-red-50 rounded-lg transition-colors whitespace-nowrap"
+                                        title="Clear all user prompts"
+                                    >
+                                        Clear All
+                                    </button>
+                                </div>
+                            </div>
+                            <textarea
+                                id="prompt"
+                                rows="3"
+                                class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter your prompt here..."
+                                onblur="savePromptIfNew(this.value)"
+                                onkeydown="handleKeyPress(event)"
+                            >Repeat this sentence: The QUICK brown Fox Jumps Over The Lazy Dog</textarea>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-sm font-medium text-gray-700">Select Models</label>
+                                <button
+                                    onclick="selectAllAndRun()"
+                                    class="text-sm text-blue-600 hover:text-blue-700 font-medium hover:underline focus:outline-none"
+                                >
+                                    Select All & Run
+                                </button>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="models" value="wizardlm2:latest" class="rounded text-blue-600" onchange="updateButtonState()">
+                                    <span>WizardLM 2</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="models" value="nemotron-mini:latest" class="rounded text-blue-600" onchange="updateButtonState()">
+                                    <span>Nemotron Mini</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="models" value="llama3.2:latest" class="rounded text-blue-600" onchange="updateButtonState()">
+                                    <span>Llama 3.2</span>
+                                </label>
+                            </div>
+
+                            <!-- Processing Mode Toggle -->
+                            <div class="mt-4 flex items-center justify-between">
+                                <label class="text-sm font-medium text-gray-700">Processing Mode:</label>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-sm text-gray-600">Sequential</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="processing-mode" class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                    <span class="text-sm text-gray-600">Parallel</span>
+                                </div>
+                            </div>
+
+                            <button
+                                id="benchmark-button"
+                                onclick="runBenchmark()"
+                                disabled
+                                class="relative w-full py-4 px-6 text-lg font-bold text-white transition-all duration-200 rounded-lg shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 disabled:hover:scale-100 enabled:bg-gradient-to-r enabled:from-blue-600 enabled:to-blue-800 enabled:hover:from-blue-700 enabled:hover:to-blue-900 enabled:hover:scale-[1.02] overflow-hidden group"
+                            >
+                                <div class="absolute inset-0 bg-white/10 group-hover:bg-white/20 transition-all duration-200 disabled:hidden"></div>
+                                <div class="absolute -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 group-enabled:group-hover:animate-shine"></div>
+                                <div class="relative flex items-center justify-center space-x-3">
+                                    <div id="spinner" class="hidden">
+                                        <div class="w-5 h-5 border-4 border-blue-200 border-t-white rounded-full animate-spin"></div>
+                                    </div>
+                                    <span class="relative">Run Benchmark</span>
+                                </div>
+                            </button>
+
+                            <style>
+                                @keyframes shine {
+                                    from {
+                                        left: -100%;
+                                    }
+                                    to {
+                                        left: 100%;
+                                    }
+                                }
+                                .animate-shine {
+                                    animation: shine 1s ease-in;
+                                }
+                                #spinner {
+                                    display: none;
+                                }
+                                #spinner.hidden {
+                                    display: none !important;
+                                }
+                                #spinner:not(.hidden) {
+                                    display: inline-flex;
+                                    align-items: center;
+                                }
+                            </style>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Benchmarks -->
+            <div class="lg:col-span-1">
+                <!-- ... existing code ... -->
+            </div>
+        </div>
+
+        <!-- LIVE STREAMING OUTPUT -->
+        <div class="mt-8">
+            <div class="bg-red-50 border-2 border-red-500 rounded-lg overflow-hidden">
+                <h2 class="text-2xl font-bold text-center bg-red-100 py-4 border-b-2 border-red-500">🔴 LIVE MODEL OUTPUT 🔴</h2>
+                <div id="streaming-output" class="p-4 bg-white font-mono text-sm whitespace-pre-wrap h-96 overflow-auto">
+                    Waiting for model output...
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let isBenchmarking = false;
+        let eventSource = null;
+
+        // Function to connect to the streaming endpoint
+        function connectToStream() {
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            eventSource = new EventSource('/api/benchmarks/stream');
+            const streamingOutput = document.getElementById('streaming-output');
+
+            eventSource.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (!data || Object.keys(data).length === 0) {
+                        return; // Ignore keepalive messages
+                    }
+
+                    // Handle different types of updates
+                    switch (data.status) {
+                        case 'starting':
+                            streamingOutput.innerHTML += `\n\n=== ${data.model} ===\n${data.message}\n`;
+                            break;
+                        case 'first_token':
+                            streamingOutput.innerHTML += `First token in ${data.time.toFixed(2)}s\n`;
+                            break;
+                        case 'generating':
+                            streamingOutput.innerHTML += data.chunk;
+                            break;
+                        case 'completed':
+                            streamingOutput.innerHTML += `\n=== Completed in ${data.total_time.toFixed(2)}s ===\n`;
+                            break;
+                    }
+
+                    // Auto-scroll to bottom
+                    streamingOutput.scrollTop = streamingOutput.scrollHeight;
+                } catch (error) {
+                    console.error('Error handling stream update:', error);
+                }
+            };
+
+            eventSource.onerror = function(error) {
+                console.error('EventSource error:', error);
+                eventSource.close();
+            };
+        }
+
+        // Load prompt library when page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/benchmarks/prompts');
+                const data = await response.json();
+
+                // Populate default prompts
+                const defaultSelect = document.getElementById('default-prompts');
+                data.default_prompts.forEach(prompt => {
+                    const option = document.createElement('option');
+                    option.value = prompt.prompt;
+                    option.textContent = prompt.prompt;
+                    defaultSelect.appendChild(option);
+                });
+
+                // Populate user prompts
+                const userSelect = document.getElementById('user-prompts');
+                if (data.user_prompts && data.user_prompts.length > 0) {
+                    data.user_prompts.forEach(prompt => {
+                        const option = document.createElement('option');
+                        option.value = prompt.prompt;
+                        option.textContent = prompt.prompt;
+                        userSelect.appendChild(option);
+                    });
+                } else {
+                    const placeholder = document.createElement('option');
+                    placeholder.disabled = true;
+                    placeholder.textContent = 'No user prompts yet';
+                    userSelect.appendChild(placeholder);
+                }
+            } catch (error) {
+                console.error('Failed to load prompt library:', error);
+            }
+        });
+
+        function selectPrompt(event, type) {
+            const select = event.target;
+            const promptArea = document.getElementById('prompt');
+
+            if (select.value) {
+                promptArea.value = select.value;
+                promptArea.focus();
+                // Reset both dropdowns to their default options
+                if (type === 'default') {
+                    document.getElementById('user-prompts').selectedIndex = 0;
+                } else {
+                    document.getElementById('default-prompts').selectedIndex = 0;
+                }
+            }
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('recent-benchmarks-dropdown');
+            const toggleButton = event.target.closest('button[onclick="toggleRecentBenchmarks()"]');
+            const isDropdownClick = event.target.closest('#recent-benchmarks-dropdown');
+
+            // Only close if click is outside dropdown and not on toggle button
+            if (!isDropdownClick && !toggleButton && !dropdown.classList.contains('hidden')) {
+                closeDropdown();
+            }
+        });
+
+        function closeDropdown() {
+            const dropdown = document.getElementById('recent-benchmarks-dropdown');
+            const backdrop = document.getElementById('dropdown-backdrop');
+            const arrow = document.getElementById('dropdown-arrow');
+
+            dropdown.classList.add('hidden');
+            backdrop.classList.add('hidden');
+            arrow.style.transform = 'rotate(0deg)';
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        function toggleRecentBenchmarks(event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const dropdown = document.getElementById('recent-benchmarks-dropdown');
+            const backdrop = document.getElementById('dropdown-backdrop');
+            const arrow = document.getElementById('dropdown-arrow');
+
+            const isHidden = dropdown.classList.contains('hidden');
+
+            if (isHidden) {
+                dropdown.classList.remove('hidden');
+                backdrop.classList.remove('hidden');
+                arrow.style.transform = 'rotate(180deg)';
+                document.body.classList.add('overflow-hidden');
+            } else {
+                closeDropdown();
+            }
+        }
+
+        function handleKeyPress(event) {
+            // Check for Command+Enter (Mac) or Ctrl+Enter (Windows/Linux)
+            if (event.key === 'Enter' && (event.metaKey || event.ctrlKey)) {
+                event.preventDefault();
+                selectAllAndRun();
+            }
+        }
+
+        function selectAllAndRun() {
+            // Select all checkboxes
+            const checkboxes = document.querySelectorAll('input[name="models"]');
+            checkboxes.forEach(checkbox => checkbox.checked = true);
+
+            // Update button state
+            updateButtonState();
+
+            // Run benchmark
+            runBenchmark();
+        }
+
+        function updateButtonState() {
+            const button = document.getElementById('benchmark-button');
+            const modelInputs = document.querySelectorAll('input[name="models"]:checked');
+            const hasModelsSelected = modelInputs.length > 0;
+
+            button.disabled = !hasModelsSelected;
+        }
+
+        async function runBenchmark() {
+            if (isBenchmarking) return;
+
+            const prompt = document.getElementById('prompt').value;
+            if (!prompt) {
+                alert('Please enter a prompt');
+                return;
+            }
+
+            const modelInputs = document.querySelectorAll('input[name="models"]:checked');
+            const models = Array.from(modelInputs).map(input => input.value);
+            if (models.length === 0) {
+                alert('Please select at least one model');
+                return;
+            }
+
+            // Clear previous output and connect to stream
+            const streamingOutput = document.getElementById('streaming-output');
+            streamingOutput.innerHTML = 'Starting benchmark...\n';
+            connectToStream();
+
+            // Get processing mode
+            const parallelProcessing = document.getElementById('processing-mode').checked;
+
+            // Show loading state
+            isBenchmarking = true;
+            const button = document.getElementById('benchmark-button');
+            const spinner = document.getElementById('spinner');
+            if (button && spinner) {
+                button.disabled = true;
+                spinner.classList.remove('hidden');
+            }
+
+            try {
+                const response = await fetch('/api/benchmarks/run', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt,
+                        models: models,
+                        parallel_processing: parallelProcessing
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                // Display results in the results section
+                const resultsDiv = document.getElementById('results');
+                if (resultsDiv) {
+                    displayResults(result);
+                }
+
+                // Refresh recent benchmarks
+                await refreshRecentBenchmarks();
+
+            } catch (error) {
+                console.error('Error:', error);
+                const results = document.getElementById('results');
+                if (results) {
+                    results.innerHTML = `
+                        <div class="card error">
+                            <h2 class="text-xl font-bold mb-4 text-red-600">Error</h2>
+                            <div class="text-red-600">${error.message}</div>
+                        </div>
+                    `;
+                }
+            } finally {
+                // Reset all states
+                isBenchmarking = false;
+                const button = document.getElementById('benchmark-button');
+                const spinner = document.getElementById('spinner');
+                if (button && spinner) {
+                    button.disabled = false;
+                    spinner.classList.add('hidden');
+                    // Make sure button state is correct based on model selection
+                    updateButtonState();
+                }
+                // Close the event source
+                if (eventSource) {
+                    eventSource.close();
+                    eventSource = null;
+                }
+            }
+        }
+
+        async function refreshRecentBenchmarks() {
+            try {
+                const response = await fetch('/api/benchmarks/history?limit=5');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const benchmarks = await response.json();
+
+                // Update the count in the button
+                const countSpan = document.querySelector('button span');
+                if (countSpan) {
+                    countSpan.textContent = `${benchmarks.length} Recent Benchmarks`;
+                }
+
+                // Update the dropdown content
+                const listContainer = document.querySelector('#recent-benchmarks-dropdown .space-y-2');
+                if (!listContainer) return;
+
+                if (benchmarks.length === 0) {
+                    listContainer.innerHTML = '<div class="text-gray-500 text-sm">No recent benchmarks found</div>';
+                } else {
+                    listContainer.innerHTML = benchmarks.map(benchmark => `
+                        <div
+                            class="p-3 border rounded hover:bg-gray-50 cursor-pointer transition-colors"
+                            onclick="loadBenchmarkDetails('${benchmark.id}')"
+                        >
+                            <div class="text-sm text-gray-600">
+                                ${benchmark.timestamp}
+                            </div>
+                            <div class="font-medium truncate">
+                                <span class="text-gray-600">Prompt:</span> ${benchmark.prompt.slice(0, 50)}...
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error refreshing recent benchmarks:', error);
+            }
+        }
+
+        function updateUIState(isLoading) {
+            const button = document.getElementById('benchmark-button');
+            const spinner = document.getElementById('spinner');
+
+            button.disabled = isLoading;
+            if (isLoading) {
+                spinner.classList.remove('hidden');
+                button.classList.add('opacity-75');
+            } else {
+                spinner.classList.add('hidden');
+                button.classList.remove('opacity-75');
+            }
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+            try {
+                // System Info
+                const sysInfo = data.system_info || {};
+
+                resultsDiv.innerHTML = `
+                    <div class="card mb-6">
+                        <h2 class="text-xl font-bold mb-4">Benchmark Results</h2>
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600">Prompt:</p>
+                            <p class="text-sm font-medium bg-gray-50 p-2 rounded mt-1">${data.prompt || 'No prompt available'}</p>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-sm text-gray-600">Processing Mode:</p>
+                            <div class="flex items-center mt-1">
+                                <span class="badge ${data.processing_mode === 'parallel' ? 'bg-success' : 'bg-info'}">${(data.processing_mode || 'Unknown').charAt(0).toUpperCase() + (data.processing_mode || 'Unknown').slice(1)}</span>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <p><strong>Platform:</strong> ${sysInfo.platform || 'N/A'}</p>
+                                <p><strong>Python:</strong> ${sysInfo.python_version || 'N/A'}</p>
+                                <p><strong>CPU Cores:</strong> ${
+                                    sysInfo.cpu ?
+                                    `${sysInfo.cpu.physical_cores || 0} physical, ${sysInfo.cpu.total_cores || 0} total` :
+                                    'N/A'
+                                }</p>
+                            </div>
+                            <div>
+                                <p><strong>Memory:</strong> ${
+                                    sysInfo.memory ?
+                                    `${Math.round(sysInfo.memory.total || 0)}GB total` :
+                                    'N/A'
+                                }</p>
+                                <p><strong>Memory Used:</strong> ${
+                                    sysInfo.memory ?
+                                    `${Math.round(sysInfo.memory.used || 0)}GB (${sysInfo.memory.percent_used || 0}%)` :
+                                    'N/A'
+                                }</p>
+                                <p><strong>GPU:</strong> ${
+                                    sysInfo.gpu && sysInfo.gpu.length > 0 ?
+                                    sysInfo.gpu[0].name || 'N/A' :
+                                    'N/A'
+                                }</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Model Results
+                if (!data.results || !Array.isArray(data.results) || data.results.length === 0) {
+                    resultsDiv.innerHTML += `
+                        <div class="card error">
+                            <h3 class="text-red-600 font-bold">No Results Available</h3>
+                            <p>No benchmark results were found for this run.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const resultsGrid = document.createElement('div');
+                resultsGrid.className = 'grid grid-cols-1 md:grid-cols-2 gap-4';
+
+                data.results.forEach((result, index) => {
+                    if (!result) return;
+
+                    const resultDiv = document.createElement('div');
+                    resultDiv.className = `card ${result.success ? 'success' : 'error'}`;
+
+                    const timing = result.timing || {};
+                    const throughput = result.throughput || {};
+
+                    resultDiv.innerHTML = `
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-lg font-bold">${result.model || 'Unknown Model'}</h3>
+                            <span class="px-2 py-1 text-sm rounded-full ${
+                                result.success
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-red-100 text-red-800'
+                            }">
+                                ${result.success ? 'Success' : 'Failed'}
+                            </span>
+                        </div>
+                        ${result.success ? `
+                            <div class="grid grid-cols-2 gap-2 text-sm mb-4">
+                                <div>
+                                    <p><strong>First Token:</strong> ${timing.time_to_first_token ? (timing.time_to_first_token * 1000).toFixed(2) + 'ms' : 'N/A'}</p>
+                                    <p><strong>Total Time:</strong> ${timing.total_time ? (timing.total_time * 1000).toFixed(2) + 'ms' : 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <p><strong>Throughput:</strong> ${throughput.bytes_per_second ? Math.round(throughput.bytes_per_second / 1024) + 'KB/s' : 'N/A'}</p>
+                                    <p><strong>Chunks:</strong> ${throughput.total_chunks || 'N/A'}</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                                <p class="text-sm font-medium text-gray-700">Response:</p>
+                                <p class="text-sm mt-1 whitespace-pre-wrap">${result.response || 'No response available'}</p>
+                            </div>
+                        ` : `
+                            <div class="text-red-600">
+                                Error: ${timing.error || 'Unknown error'}
+                            </div>
+                        `}
+                    `;
+                    resultsGrid.appendChild(resultDiv);
+                });
+
+                resultsDiv.appendChild(resultsGrid);
+
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="card error">
+                        <h3 class="text-red-600 font-bold">Error</h3>
+                        <p>Failed to display benchmark results: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadBenchmarkDetails(benchmarkId) {
+            try {
+                const response = await fetch(`/api/benchmarks/history/${benchmarkId}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                displayResults(data);
+                // Scroll to results
+                document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <div class="card error">
+                        <h3 class="text-red-600 font-bold">Error</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function savePromptIfNew(promptText) {
+            if (!promptText.trim()) return;
+
+            try {
+                const response = await fetch('/api/benchmarks/prompts/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        prompt: promptText,
+                        category: 'Custom',
+                        name: null  // Let the server generate a name
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.status === 'success') {
+                    console.log('Prompt saved:', result.message);
+                    await refreshPromptLibrary();
+                } else if (result.status === 'exists') {
+                    console.log('Prompt already exists in library');
+                }
+            } catch (error) {
+                console.error('Failed to save prompt:', error);
+            }
+        }
+
+        async function deleteUserPrompt(promptName) {
+            if (!confirm(`Are you sure you want to delete "${promptName}"?`)) return;
+
+            try {
+                const response = await fetch(`/api/benchmarks/prompts/user/${encodeURIComponent(promptName)}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    await refreshPromptLibrary();
+                }
+            } catch (error) {
+                console.error('Failed to delete prompt:', error);
+            }
+        }
+
+        async function clearUserPrompts() {
+            if (!confirm('Are you sure you want to clear all user prompts?')) return;
+
+            try {
+                const response = await fetch('/api/benchmarks/prompts/user', {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    await refreshPromptLibrary();
+                }
+            } catch (error) {
+                console.error('Failed to clear prompts:', error);
+            }
+        }
+
+        async function refreshPromptLibrary() {
+            try {
+                const response = await fetch('/api/benchmarks/prompts');
+                const data = await response.json();
+
+                // Refresh default prompts
+                const defaultSelect = document.getElementById('default-prompts');
+                defaultSelect.innerHTML = '<option value="">Select from Default Prompts...</option>';
+                data.default_prompts.forEach(prompt => {
+                    const option = document.createElement('option');
+                    option.value = prompt.prompt;
+                    option.textContent = prompt.prompt;
+                    defaultSelect.appendChild(option);
+                });
+
+                // Refresh user prompts
+                const userSelect = document.getElementById('user-prompts');
+                userSelect.innerHTML = '<option value="">Select from User Prompts...</option>';
+                if (data.user_prompts && data.user_prompts.length > 0) {
+                    data.user_prompts.forEach(prompt => {
+                        const option = document.createElement('option');
+                        option.value = prompt.prompt;
+                        option.textContent = prompt.prompt;
+                        userSelect.appendChild(option);
+                    });
+                } else {
+                    const placeholder = document.createElement('option');
+                    placeholder.disabled = true;
+                    placeholder.textContent = 'No user prompts yet';
+                    userSelect.appendChild(placeholder);
+                }
+            } catch (error) {
+                console.error('Failed to refresh prompt library:', error);
+            }
+        }
+
+        // Initialize the prompt library when the page loads
+        window.addEventListener('DOMContentLoaded', refreshPromptLibrary);
+    </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+/* Base styles */
+.card {
+    @apply bg-white p-6 rounded-lg shadow-sm;
+}
+
+.button {
+    @apply text-white px-6 py-3 rounded-lg font-medium text-sm tracking-wide
+           shadow-sm transition-all duration-200 transform;
+}
+
+.button:not(:disabled) {
+    @apply bg-blue-500 hover:bg-blue-600 hover:shadow-md hover:-translate-y-0.5
+           active:bg-blue-700 active:shadow-inner active:translate-y-0 cursor-pointer;
+}
+
+.button:disabled {
+    @apply bg-gray-300 text-gray-500 cursor-not-allowed;
+    backdrop-filter: blur(4px);
+}
+
+.error {
+    @apply border-red-200 bg-red-50;
+}
+
+.success {
+    @apply border-green-200 bg-green-50;
+}
+
+/* Spinner animation */
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
