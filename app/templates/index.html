@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama Benchmark</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <h1 class="app-title">Ollama Benchmark</h1>
+            <p class="app-description">Compare performance across different Ollama LLM models with our sleek, modern benchmarking tool</p>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+                <i data-feather="moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>Run New Benchmark</h2>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="prompt-input">Prompt:</label>
+                    <textarea id="prompt-input" class="form-control" placeholder="Enter your prompt here..." rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Models:</label>
+                    <div id="model-selection" class="model-selection">
+                        <!-- Model checkboxes will be inserted here -->
+                        <div class="loading-models">Loading available models...</div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button id="run-benchmark" class="btn primary">Run Benchmark</button>
+                </div>
+                <div id="benchmark-error" class="error-message"></div>
+            </div>
+        </div>
+
+        <div id="benchmark-results" class="card result-card hidden">
+            <div class="card-header">
+                <h2>Benchmark Results</h2>
+                <div class="timestamp" id="result-timestamp"></div>
+            </div>
+            <div class="card-body">
+                <div class="prompt-preview">
+                    <h4>Prompt</h4>
+                    <div id="result-prompt" class="prompt-text"></div>
+                </div>
+
+                <div class="result-tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-btn active" data-tab="performance">Performance</button>
+                        <button class="tab-btn" data-tab="responses">Responses</button>
+                        <button class="tab-btn" data-tab="system">System Info</button>
+                    </div>
+
+                    <div class="tab-content">
+                        <div id="performance-tab" class="tab-pane active">
+                            <div class="charts-container">
+                                <div class="chart-wrapper">
+                                    <h4>Response Time (seconds)</h4>
+                                    <canvas id="time-chart"></canvas>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <h4>Tokens Per Second</h4>
+                                    <canvas id="tokens-chart"></canvas>
+                                </div>
+                            </div>
+
+                            <div class="charts-container">
+                                <div class="chart-wrapper">
+                                    <h4>Total Tokens Generated</h4>
+                                    <canvas id="output-chart"></canvas>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <h4>Efficiency Score</h4>
+                                    <canvas id="efficiency-chart"></canvas>
+                                    <div class="chart-explanation">
+                                        Score = (Tokens/sec × Total Tokens) ÷ 100
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="metrics-grid" id="metrics-grid">
+                                <!-- Performance metrics will be inserted here -->
+                            </div>
+
+                            <div class="metrics-legend">
+                                <div class="legend-item">
+                                    <span class="legend-swatch fastest-indicator"></span>
+                                    <span class="legend-label">Fastest Model</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-swatch throughput-indicator"></span>
+                                    <span class="legend-label">Highest Throughput</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-swatch best-indicator"></span>
+                                    <span class="legend-label">Best Metric</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="responses-tab" class="tab-pane">
+                            <div id="model-responses">
+                                <!-- Model responses will be inserted here -->
+                            </div>
+                        </div>
+
+                        <div id="system-tab" class="tab-pane">
+                            <div id="system-info">
+                                <!-- System info will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Benchmark History</h2>
+                <button id="refresh-history" class="btn secondary small">Refresh</button>
+            </div>
+            <div class="card-body">
+                <div id="history-list" class="history-list">
+                    <!-- History items will be inserted here -->
+                    <div class="loading-history">Loading history...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>Ollama Benchmark v0.1.1 | Built with FastAPI</p>
+        </div>
+    </footer>
+
+    <!-- Loading overlay with progress log -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+        <div class="loading-content">
+            <div class="header-section">
+                <div class="spinner"></div>
+                <div class="loading-text">Running benchmark...</div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-percentage">0%</div>
+            </div>
+
+            <div class="streaming-section">
+                <div class="section-header">
+                    <h4>Live Responses</h4>
+                    <div class="toggle-container">
+                        <label class="toggle-label" for="auto-scroll">Auto-scroll</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="auto-scroll" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                <div id="streaming-grid" class="streaming-grid">
+                    <!-- Streaming responses will be inserted here dynamically -->
+                </div>
+            </div>
+
+            <div class="log-container" id="benchmark-log">
+                <div class="log-header">
+                    <h4>Benchmark Progress</h4>
+                </div>
+                <div class="log-content" id="log-content">
+                    <div class="log-entry">Initializing benchmark...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="/static/js/streaming.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        // Initialize Feather icons
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+        });
+    </script>
+</body>
+</html>
